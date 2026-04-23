@@ -5809,9 +5809,9 @@ function TimeRangeSelector({
 }) {
   const [showPicker, setShowPicker] = useState(false);
   const ranges = [
-    { id: 'day', label: '按日' },
-    { id: 'week', label: '按周' },
-    { id: 'month', label: '按月' }
+    { id: 'day', label: '日' },
+    { id: 'week', label: '周' },
+    { id: 'month', label: '月' }
   ];
   if (showCustom) ranges.push({ id: 'custom', label: '自定义' });
 
@@ -6076,9 +6076,9 @@ function DashboardOverview() {
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
               {[
-                { id: 'day', name: '按日' },
-                { id: 'week', name: '按周' },
-                { id: 'month', name: '按月' }
+                { id: 'day', name: '日' },
+                { id: 'week', name: '周' },
+                { id: 'month', name: '月' }
               ].map(r => (
                 <button 
                   key={r.id}
@@ -6655,9 +6655,9 @@ function UserDashboard() {
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
               {[
-                { id: 'day', name: '按日' },
-                { id: 'week', name: '按周' },
-                { id: 'month', name: '按月' }
+                { id: 'day', name: '日' },
+                { id: 'week', name: '周' },
+                { id: 'month', name: '月' }
               ].map(r => (
                 <button 
                   key={r.id}
@@ -7285,9 +7285,9 @@ function CourseDashboard() {
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
               {[
-                { id: 'day', name: '按日' },
-                { id: 'week', name: '按周' },
-                { id: 'month', name: '按月' }
+                { id: 'day', name: '日' },
+                { id: 'week', name: '周' },
+                { id: 'month', name: '月' }
               ].map(r => (
                 <button 
                   key={r.id}
@@ -7368,7 +7368,7 @@ function CourseDashboard() {
           <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-4">
-                <h3 className="text-lg font-bold text-gray-800">课程浏览数据 (PV/UV)</h3>
+                <h3 className="text-lg font-bold text-gray-800">课程浏览数据</h3>
                 <button 
                   onClick={() => setShowBrowseData(true)}
                   className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
@@ -7533,8 +7533,8 @@ function CourseDashboard() {
               </div>
               <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
                 {[
-                  { id: 'week', label: '按周' },
-                  { id: 'month', label: '按月' },
+                  { id: 'week', label: '周' },
+                  { id: 'month', label: '月' },
                   { id: 'total', label: '累计' }
                 ].map(r => (
                   <button 
@@ -7733,9 +7733,9 @@ function ClassDashboard() {
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
               {[
-                { id: 'day', name: '按日' },
-                { id: 'week', name: '按周' },
-                { id: 'month', name: '按月' }
+                { id: 'day', name: '日' },
+                { id: 'week', name: '周' },
+                { id: 'month', name: '月' }
               ].map(r => (
                 <button 
                   key={r.id}
@@ -7815,7 +7815,7 @@ function ClassDashboard() {
           <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-4">
-                <h3 className="text-lg font-bold text-gray-800">班级浏览数据 (PV/UV)</h3>
+                <h3 className="text-lg font-bold text-gray-800">班级浏览数据</h3>
                 <button 
                   onClick={() => setShowBrowseData(true)}
                   className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
@@ -7980,8 +7980,8 @@ function ClassDashboard() {
               </div>
               <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
                 {[
-                  { id: 'week', label: '按周' },
-                  { id: 'month', label: '按月' },
+                  { id: 'week', label: '周' },
+                  { id: 'month', label: '月' },
                   { id: 'total', label: '累计' }
                 ].map(r => (
                   <button 
@@ -8152,14 +8152,14 @@ function CertDashboard() {
     { label: '累计销售量', value: c.totalSalesVolume.toLocaleString(), icon: <TrendingUp className="text-blue-600" /> },
     { label: '累计销售额', value: `¥${c.conversion.revenue.toLocaleString()}`, icon: <BarChart3 className="text-purple-500" /> },
     { label: '累计学习人数', value: (c as any).studentCount.toLocaleString(), icon: <Users className="text-indigo-500" /> },
-    { label: '累计获取率', value: `${(c as any).acquisitionRate}%`, icon: <CheckCircle2 className="text-emerald-600" /> },
+    { label: '累计获取率', value: `${((c as any).acquisitionRate || 0).toFixed(2)}%`, icon: <CheckCircle2 className="text-emerald-600" /> },
   ] : [
     { label: `${rangeLabel}颁发`, value: Math.floor(c.totalIssued * 0.1).toLocaleString(), icon: <FileCheck className="text-blue-400" /> },
     { label: `${rangeLabel}上架`, value: c.weeklyNew.toLocaleString(), icon: <Plus className="text-cyan-500" /> },
     { label: `${rangeLabel}销售量`, value: c.periodSales.toLocaleString(), icon: <TrendingUp className="text-emerald-500" /> },
     { label: `${rangeLabel}销售额`, value: `¥${c.periodRevenue.toLocaleString()}`, icon: <BarChart3 className="text-blue-600" /> },
     { label: `${rangeLabel}学习人数`, value: Math.floor((c as any).studentCount * 0.15).toLocaleString(), icon: <Users className="text-indigo-400" /> },
-    { label: `${rangeLabel}获取率`, value: `${((c as any).acquisitionRate || 0) + 1.2}%`, icon: <CheckCircle2 className="text-emerald-400" /> },
+    { label: `${rangeLabel}获取率`, value: `${(((c as any).acquisitionRate || 0) + 1.2).toFixed(2)}%`, icon: <CheckCircle2 className="text-emerald-400" /> },
   ];
 
   return (
@@ -8252,7 +8252,7 @@ function CertDashboard() {
           <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-4">
-                <h3 className="text-lg font-bold text-gray-800">证书浏览数据 (PV/UV)</h3>
+                <h3 className="text-lg font-bold text-gray-800">证书浏览数据</h3>
                 <button 
                   onClick={() => setShowBrowseData(true)}
                   className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
@@ -8399,8 +8399,8 @@ function CertDashboard() {
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
             <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
               {[
-                { id: 'week', label: '按周' },
-                { id: 'month', label: '按月' },
+                { id: 'week', label: '周' },
+                { id: 'month', label: '月' },
                 { id: 'total', label: '累计' }
               ].map(r => (
                 <button 
