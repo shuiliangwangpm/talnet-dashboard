@@ -320,6 +320,7 @@ export const MOCK_DASHBOARD_OVERVIEW = {
   totalSales: 125800,
   monthlySalesRevenue: 15800,
   monthlySalesVolume: 450,
+  totalSalesVolume: 15800,
   completionRate: 85.5,
   trends: {
     day: Array.from({ length: 30 }, (_, i) => {
@@ -522,6 +523,26 @@ export const MOCK_USER_STATS = {
       h5: Math.floor(Math.random() * 250) + 120
     }))
   },
+  recallTrend: {
+    day: Array.from({ length: 30 }, (_, i) => ({
+      date: `04-${String(i + 1).padStart(2, '0')}`,
+      value: Math.floor(Math.random() * 15) + 5,
+      pc: Math.floor(Math.random() * 6) + 2,
+      h5: Math.floor(Math.random() * 9) + 3
+    })),
+    week: Array.from({ length: 30 }, (_, i) => ({
+      date: `W${String(i + 1).padStart(2, '0')}`,
+      value: Math.floor(Math.random() * 80) + 30,
+      pc: Math.floor(Math.random() * 30) + 15,
+      h5: Math.floor(Math.random() * 50) + 15
+    })),
+    month: Array.from({ length: 30 }, (_, i) => ({
+      date: `M${String(i + 1).padStart(2, '0')}`,
+      value: Math.floor(Math.random() * 300) + 100,
+      pc: Math.floor(Math.random() * 100) + 50,
+      h5: Math.floor(Math.random() * 200) + 50
+    }))
+  },
   durationTrend: {
     day: Array.from({ length: 30 }, (_, i) => ({
       date: `04-${String(i + 1).padStart(2, '0')}`,
@@ -576,7 +597,62 @@ export const MOCK_USER_STATS = {
       { name: '产品经理', value: 15 },
       { name: '学生', value: 10 },
       { name: '其他', value: 5 }
-    ]
+    ],
+    domain: [
+      { name: '物联网', value: 15 },
+      { name: '人工智能', value: 20 },
+      { name: '大数据', value: 18 },
+      { name: '区块链', value: 8 },
+      { name: '数字商科', value: 10 },
+      { name: '工业互联网', value: 7 },
+      { name: '三教改革', value: 6 },
+      { name: '元宇宙', value: 4 },
+      { name: '创新创业', value: 7 },
+      { name: 'OpenHarmony', value: 5 }
+    ],
+    onlineDurationDistribution: [
+      { name: '0-5分钟', value: 3500 },
+      { name: '5-15分钟', value: 2800 },
+      { name: '15-30分钟', value: 1800 },
+      { name: '30-45分钟', value: 1500 },
+      { name: '45-60分钟', value: 1200 },
+      { name: '1-2小时', value: 850 },
+      { name: '2-4小时', value: 450 },
+      { name: '4-8小时', value: 200 },
+      { name: '8小时以上', value: 100 }
+    ],
+    loginFrequencyDistribution: {
+      week: [
+        { name: '0次', value: 500 },
+        { name: '1次', value: 1200 },
+        { name: '2次', value: 1800 },
+        { name: '3次', value: 1500 },
+        { name: '4次', value: 1200 },
+        { name: '5次', value: 900 },
+        { name: '6次', value: 600 },
+        { name: '7次+', value: 400 }
+      ],
+      month: [
+        { name: '0次', value: 1000 },
+        { name: '1-2次', value: 2500 },
+        { name: '3-5次', value: 1800 },
+        { name: '6-10次', value: 1200 },
+        { name: '11-15次', value: 800 },
+        { name: '16-20次', value: 600 },
+        { name: '21-25次', value: 400 },
+        { name: '26次+', value: 200 }
+      ],
+      year: [
+        { name: '1-10次', value: 4500 },
+        { name: '11-30次', value: 3200 },
+        { name: '31-60次', value: 2400 },
+        { name: '61-100次', value: 1800 },
+        { name: '101-150次', value: 1200 },
+        { name: '151-200次', value: 800 },
+        { name: '201-300次', value: 500 },
+        { name: '301次+', value: 300 }
+      ]
+    }
   },
   loginLogs: Array.from({ length: 50 }, (_, i) => ({
     id: `L${1000 + i}`,

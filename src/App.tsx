@@ -57,6 +57,8 @@ import {
   UserPlus,
   Layout,
   UserMinus,
+  PlusCircle,
+  Award,
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -459,12 +461,6 @@ export default function App() {
                       试题数据
                     </div>
                     <div 
-                      className={cn("px-4 py-3 rounded-xl cursor-pointer transition-all mt-1", view === 'admin-dashboard' && activeDashboardModule === 'learning' ? "bg-[#7DC16A] text-white shadow-lg shadow-[#7DC16A]/20" : "text-gray-600 hover:bg-gray-50")}
-                      onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('learning'); setIsMobileMenuOpen(false); }}
-                    >
-                      学习数据
-                    </div>
-                    <div 
                       className={cn("px-4 py-3 rounded-xl cursor-pointer transition-all mt-1", view === 'admin-org-user-mgmt' ? "bg-[#7DC16A] text-white shadow-lg shadow-[#7DC16A]/20" : "text-gray-600 hover:bg-gray-50")}
                       onClick={() => { setView('admin-org-user-mgmt'); setIsMobileMenuOpen(false); }}
                     >
@@ -602,16 +598,6 @@ export default function App() {
               >
                 <HelpCircle size={18} />
                 <span className="font-medium">试题数据</span>
-              </div>
-              <div 
-                className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all ml-4",
-                  view === 'admin-dashboard' && activeDashboardModule === 'learning' ? "bg-[#7DC16A] text-white shadow-lg shadow-[#7DC16A]/20" : "text-gray-600 hover:bg-gray-50"
-                )}
-                onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('learning'); }}
-              >
-                <Clock size={18} />
-                <span className="font-medium">学习数据</span>
               </div>
               <div 
                 className={cn(
@@ -5926,14 +5912,17 @@ function DataViewModal({
   onClose: () => void, 
   title: string, 
   data: any[], 
-  columns: { key: string, label: string }[] 
+  columns: { key: string, label: string, format?: (val: any) => string }[] 
 }) {
   if (!isOpen) return null;
 
   const handleExport = () => {
     const csv = [
       columns.map(c => c.label).join(','),
-      ...data.map(row => columns.map(c => row[c.key]).join(','))
+      ...data.map(row => columns.map(c => {
+        const val = row[c.key];
+        return c.format ? c.format(val) : val;
+      }).join(','))
     ].join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
@@ -5949,45 +5938,51 @@ function DataViewModal({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+        className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/20 backdrop-blur-sm"
         onClick={onClose}
       >
         <motion.div 
-          initial={{ scale: 0.95, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.95, opacity: 0 }}
-          className="bg-white rounded-3xl w-full max-w-4xl max-h-[80vh] overflow-hidden shadow-2xl"
+          initial={{ scale: 0.9, opacity: 0, y: 20 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.9, opacity: 0, y: 20 }}
+          className="bg-white rounded-[32px] w-full max-w-4xl max-h-[80vh] overflow-hidden shadow-2xl flex flex-col"
           onClick={e => e.stopPropagation()}
         >
-          <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-            <h3 className="text-xl font-bold text-gray-800">{title}</h3>
-            <div className="flex items-center gap-4">
+          <div className="p-8 border-b border-gray-50 flex items-center justify-between shrink-0">
+            <div>
+              <h3 className="text-xl font-bold text-gray-800">{title}明细</h3>
+              <p className="text-xs text-gray-400 mt-1">共 {data.length} 条统计记录</p>
+            </div>
+            <div className="flex items-center gap-3">
               <button 
                 onClick={handleExport}
-                className="flex items-center gap-2 px-4 py-2 bg-[#7DC16A] text-white rounded-xl text-sm font-bold hover:bg-[#69A159] transition-all"
+                className="flex items-center gap-2 px-5 py-2.5 bg-[#7DC16A] text-white rounded-xl text-sm font-bold shadow-lg shadow-[#7DC16A]/20 hover:scale-105 active:scale-95 transition-all"
               >
                 <Download size={16} />
                 导出CSV
               </button>
-              <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-xl transition-all">
-                <X size={20} className="text-gray-400" />
+              <button onClick={onClose} className="p-3 hover:bg-gray-50 rounded-xl transition-colors text-gray-400">
+                <X size={20} />
               </button>
             </div>
           </div>
-          <div className="overflow-auto max-h-[calc(80vh-100px)]">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-gray-50 text-gray-500 font-medium sticky top-0">
-                <tr>
+          
+          <div className="flex-1 overflow-auto p-4">
+            <table className="w-full">
+              <thead className="sticky top-0 bg-white z-10">
+                <tr className="border-b border-gray-50">
                   {columns.map(c => (
-                    <th key={c.key} className="px-6 py-4">{c.label}</th>
+                    <th key={c.key} className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">{c.label}</th>
                   ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {data.map((row, i) => (
-                  <tr key={i} className="hover:bg-gray-50 transition-colors">
+                  <tr key={i} className="hover:bg-gray-50/50 transition-colors group">
                     {columns.map(c => (
-                      <td key={c.key} className="px-6 py-4 text-gray-800">{row[c.key]}</td>
+                      <td key={c.key} className="px-6 py-4 text-sm font-medium text-gray-600 group-hover:text-gray-900 transition-colors">
+                        {c.format ? c.format(row[c.key]) : row[c.key]}
+                      </td>
                     ))}
                   </tr>
                 ))}
@@ -6060,6 +6055,7 @@ function DashboardOverview() {
     { label: `${rangeLabel}注册量`, value: MOCK_DASHBOARD_OVERVIEW.monthlyRegistered.toLocaleString(), icon: <UserPlus className="text-cyan-500" /> },
     { label: `${rangeLabel}活跃`, value: MOCK_DASHBOARD_OVERVIEW.monthlyActive.toLocaleString(), icon: <Activity className="text-green-500" /> },
     { label: '累计销售额', value: `¥${MOCK_DASHBOARD_OVERVIEW.totalSales.toLocaleString()}`, icon: <TrendingUp className="text-red-500" /> },
+    { label: '累计销售量', value: MOCK_DASHBOARD_OVERVIEW.totalSalesVolume.toLocaleString(), icon: <FileText className="text-blue-600" /> },
     { label: `${rangeLabel}销售额`, value: `¥${MOCK_DASHBOARD_OVERVIEW.monthlySalesRevenue.toLocaleString()}`, icon: <CheckCircle2 className="text-purple-500" /> },
     { label: `${rangeLabel}销售量`, value: MOCK_DASHBOARD_OVERVIEW.monthlySalesVolume.toLocaleString(), icon: <FileText className="text-orange-500" /> },
   ];
@@ -6128,17 +6124,17 @@ function DashboardOverview() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4">
           {stats.map((s, i) => (
-            <div key={i} className="bg-gray-50/50 p-6 rounded-2xl border border-gray-100 space-y-4">
+            <div key={i} className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100 space-y-3 transition-all hover:bg-white hover:shadow-md group">
               <div className="flex items-center justify-between">
-                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
                   {s.icon}
                 </div>
               </div>
               <div>
-                <p className="text-sm text-gray-400 font-medium">{s.label}</p>
-                <p className="text-2xl font-bold text-gray-800 mt-1">{s.value}</p>
+                <p className="text-[10px] text-gray-400 font-medium truncate">{s.label}</p>
+                <p className="text-lg font-bold text-gray-800 mt-1">{s.value}</p>
               </div>
             </div>
           ))}
@@ -6583,6 +6579,7 @@ function UserDashboard() {
   const [churnRange, setChurnRange] = useState<'day' | 'week' | 'month' | 'custom'>('day');
   const [durationRange, setDurationRange] = useState<'day' | 'week' | 'month' | 'custom'>('day');
   const [retentionRange, setRetentionRange] = useState<'day' | 'week' | 'month'>('day');
+  const [freqRange, setFreqRange] = useState<'week' | 'month' | 'year'>('week');
   const [logPage, setLogPage] = useState(1);
   const [showGrowthData, setShowGrowthData] = useState(false);
   const [showActivityData, setShowActivityData] = useState(false);
@@ -6643,6 +6640,7 @@ function UserDashboard() {
   const stats = [
     { label: '累计注册', value: MOCK_USER_STATS.totalRegistered.toLocaleString(), icon: <Users className="text-blue-500" /> },
     { label: '累计付费用户数', value: MOCK_USER_STATS.paidUsers.toLocaleString(), icon: <TrendingUp className="text-cyan-500" /> },
+    { label: `${rangeLabel}新增付费`, value: Math.floor(activeValue * 0.15).toLocaleString(), icon: <PlusCircle className="text-indigo-500" /> },
     { label: `${rangeLabel}活跃`, value: activeValue.toLocaleString(), icon: <Activity className="text-green-500" /> },
     { label: '新增流失用户', value: MOCK_USER_STATS.newChurnCount.toLocaleString(), icon: <UserMinus className="text-red-500" /> },
   ];
@@ -6705,17 +6703,17 @@ function UserDashboard() {
         </div>
 
         {/* Stats Cards Inside Same Container */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
           {stats.map((s, i) => (
-            <div key={i} className="bg-gray-50/50 p-6 rounded-3xl border border-gray-50 space-y-4 transition-all hover:bg-white hover:shadow-md hover:border-gray-100 group">
+            <div key={i} className="bg-gray-50/50 p-4 rounded-3xl border border-gray-50 space-y-3 transition-all hover:bg-white hover:shadow-md hover:border-gray-100 group">
               <div className="flex items-center justify-between">
-                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
                   {s.icon}
                 </div>
               </div>
               <div>
-                <p className="text-sm text-gray-400 font-medium">{s.label}</p>
-                <p className="text-2xl font-bold text-gray-800 mt-1">{s.value}</p>
+                <p className="text-[10px] text-gray-400 font-medium truncate">{s.label}</p>
+                <p className="text-lg font-bold text-gray-800 mt-1">{s.value}</p>
               </div>
             </div>
           ))}
@@ -6790,25 +6788,62 @@ function UserDashboard() {
         </div>
       </div>
 
-      {/* User Churn */}
+      {/* User Churn & Recall */}
       <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
           <div className="flex items-center gap-4">
-            <h3 className="text-lg font-bold text-gray-800">用户流失情况</h3>
+            <h3 className="text-lg font-bold text-gray-800">用户召回与流失情况</h3>
+            <button 
+              onClick={() => setShowActivityData(true)}
+              className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
+            >
+              <FileText size={14} />
+              查看数据
+            </button>
           </div>
-          <TimeRangeSelector range={churnRange} onChange={setChurnRange} color="red" />
+          <TimeRangeSelector range={churnRange} onChange={setChurnRange} color="emerald" />
         </div>
         <div className="h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={MOCK_USER_STATS.churnTrend[churnRange === 'week' || churnRange === 'month' ? 'month' : churnRange === 'custom' ? 'day' : churnRange]}>
+            <LineChart data={churnRange === 'week' || churnRange === 'month' ? 
+              MOCK_USER_STATS.recallTrend.month.map((item, idx) => {
+                const churnItem = (MOCK_USER_STATS.churnTrend.month[idx] || {}) as any;
+                return {
+                  date: item.date,
+                  r_total: item.value,
+                  r_pc: item.pc,
+                  r_h5: item.h5,
+                  c_total: churnItem.value,
+                  c_pc: churnItem.pc,
+                  c_h5: churnItem.h5
+                };
+              }) : 
+              MOCK_USER_STATS.recallTrend.day.map((item, idx) => {
+                const churnItem = (MOCK_USER_STATS.churnTrend.day[idx] || {}) as any;
+                return {
+                  date: item.date,
+                  r_total: item.value,
+                  r_pc: item.pc,
+                  r_h5: item.h5,
+                  c_total: churnItem.value,
+                  c_pc: churnItem.pc,
+                  c_h5: churnItem.h5
+                };
+              })
+            }>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
               <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
               <YAxis axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
               <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
-              <Legend iconType="circle" />
-              <Line type="monotone" dataKey="value" name="全部渠道" stroke="#EF4444" strokeWidth={3} dot={false} />
-              <Line type="monotone" dataKey="pc" name="PC端" stroke="#F87171" strokeWidth={2} strokeDasharray="5 5" dot={false} />
-              <Line type="monotone" dataKey="h5" name="H5端" stroke="#FCA5A5" strokeWidth={2} strokeDasharray="5 5" dot={false} />
+              <Legend iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
+              {/* Recall Lines (Green) */}
+              <Line type="monotone" dataKey="r_total" name="总召回" stroke="#10B981" strokeWidth={3} dot={{r: 4}} />
+              <Line type="monotone" dataKey="r_pc" name="召回-PC端" stroke="#34D399" strokeWidth={1} strokeDasharray="3 3" dot={false} />
+              <Line type="monotone" dataKey="r_h5" name="召回-H5端" stroke="#6EE7B7" strokeWidth={1} strokeDasharray="3 3" dot={false} />
+              {/* Churn Lines (Red) */}
+              <Line type="monotone" dataKey="c_total" name="总流失" stroke="#EF4444" strokeWidth={2} dot={false} strokeOpacity={0.6} />
+              <Line type="monotone" dataKey="c_pc" name="流失-PC端" stroke="#F87171" strokeWidth={1} strokeDasharray="5 5" dot={false} strokeOpacity={0.5} />
+              <Line type="monotone" dataKey="c_h5" name="流失-H5端" stroke="#FCA5A5" strokeWidth={1} strokeDasharray="5 5" dot={false} strokeOpacity={0.5} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -6838,10 +6873,86 @@ function UserDashboard() {
         </div>
       </div>
 
+      {/* New Distributions: Online Duration and Login Frequency */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Online Duration Distribution */}
+        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+          <h3 className="text-lg font-bold text-gray-800 mb-8">用户在线时长分布</h3>
+          <div className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={(MOCK_USER_STATS as any).distribution.onlineDurationDistribution}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                <YAxis axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                <Tooltip cursor={{fill: '#F9FAFB'}} contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
+                <Bar dataKey="value" name="用户数" fill="#8B5CF6" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Login Frequency Distribution */}
+        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+          <div className="flex items-center justify-between mb-8">
+            <h3 className="text-lg font-bold text-gray-800">登录次数分布</h3>
+            <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
+              {[
+                { id: 'week', label: '周' },
+                { id: 'month', label: '月' },
+                { id: 'year', label: '年' }
+              ].map(r => (
+                <button 
+                  key={r.id}
+                  onClick={() => setFreqRange(r.id as any)}
+                  className={cn(
+                    "px-4 py-1 text-xs font-bold rounded-lg transition-all",
+                    freqRange === r.id ? "bg-white text-indigo-600 shadow-sm" : "text-gray-400 hover:text-gray-600"
+                  )}
+                >
+                  {r.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={(MOCK_USER_STATS as any).distribution.loginFrequencyDistribution[freqRange]}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                <YAxis axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                <Tooltip cursor={{fill: '#F9FAFB'}} contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
+                <Bar dataKey="value" name="用户数" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
       {/* User Retention Matrix */}
       <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
         <div className="flex items-center justify-between mb-8">
-          <h3 className="text-lg font-bold text-gray-800">用户留存情况</h3>
+          <div className="flex items-center gap-4">
+            <h3 className="text-lg font-bold text-gray-800">用户留存情况</h3>
+            <button 
+              className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all"
+              onClick={() => {
+                const csv = "首次购买日期,总用户数,1天后,2天后,3天后,4天后,5天后,6天后,7天后,8天后,9天后,10天后,11天后,12天后,13天后,14天后\n" + 
+                  MOCK_USER_STATS.retentionMatrix[retentionRange].map(row => `${row.date},${row.total},${row.values.join(',')}`).join('\n');
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.setAttribute('hidden', '');
+                a.setAttribute('href', url);
+                a.setAttribute('download', `retention_${retentionRange}.csv`);
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+              }}
+            >
+              <Download size={14} />
+              导出数据
+            </button>
+          </div>
           <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
             {[
               { id: 'day', label: '日留存' },
@@ -6867,7 +6978,7 @@ function UserDashboard() {
       {/* Portrait */}
       <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
         <h3 className="text-lg font-bold text-gray-800 mb-8">用户画像分布</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div className="h-[250px]">
             <p className="text-center text-xs font-bold text-gray-400 mb-4">学历分布</p>
             <ResponsiveContainer width="100%" height="100%">
@@ -6876,8 +6987,8 @@ function UserDashboard() {
                   data={MOCK_USER_STATS.distribution.education}
                   cx="50%"
                   cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
+                  innerRadius={50}
+                  outerRadius={70}
                   paddingAngle={5}
                   dataKey="value"
                 >
@@ -6898,8 +7009,8 @@ function UserDashboard() {
                   data={MOCK_USER_STATS.distribution.gender}
                   cx="50%"
                   cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
+                  innerRadius={50}
+                  outerRadius={70}
                   paddingAngle={5}
                   dataKey="value"
                 >
@@ -6920,12 +7031,34 @@ function UserDashboard() {
                   data={MOCK_USER_STATS.distribution.position}
                   cx="50%"
                   cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
+                  innerRadius={50}
+                  outerRadius={70}
                   paddingAngle={5}
                   dataKey="value"
                 >
                   {MOCK_USER_STATS.distribution.position.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend verticalAlign="bottom" align="center" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="h-[250px]">
+            <p className="text-center text-xs font-bold text-gray-400 mb-4">领域分布</p>
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={MOCK_USER_STATS.distribution.domain}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={50}
+                  outerRadius={70}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {(MOCK_USER_STATS.distribution as any).domain.map((entry: any, index: number) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
@@ -7052,6 +7185,7 @@ function UserDashboard() {
 function CourseDashboard() {
   const [globalRange, setGlobalRange] = useState<'day' | 'week' | 'month'>('week');
   const [selectedSubValue, setSelectedSubValue] = useState('2023-W16');
+  const [statMode, setStatMode] = useState<'added' | 'accumulated'>('added');
 
   useEffect(() => {
     if (globalRange === 'day') setSelectedSubValue('2023-04-21');
@@ -7065,7 +7199,7 @@ function CourseDashboard() {
   const [salesRange, setSalesRange] = useState<'day' | 'week' | 'month' | 'custom'>('day');
   const [rankingType, setRankingType] = useState<'domain' | 'position' | 'certification'>('domain');
   const [rankingRange, setRankingRange] = useState<'week' | 'month' | 'total'>('total');
-  const [rankingSort, setRankingSort] = useState<'count' | 'pv' | 'uv' | 'inquiries' | 'sales'>('count');
+  const [rankingSort, setRankingSort] = useState<'count' | 'pv' | 'uv' | 'inquiries' | 'sales' | 'revenue'>('count');
   const [showBrowseData, setShowBrowseData] = useState(false);
   const [showEngagementData, setShowEngagementData] = useState(false);
   const [showLearningData, setShowLearningData] = useState(false);
@@ -7104,17 +7238,22 @@ function CourseDashboard() {
 
   const rangeLabel = globalRange === 'day' ? '本日' : globalRange === 'week' ? '本周' : '本月';
 
-  const stats = [
+  const stats = statMode === 'accumulated' ? [
     { label: '累计上架', value: c.totalPublished.toLocaleString(), icon: <BookOpen className="text-blue-500" /> },
-    { label: `${rangeLabel}新增`, value: c.weeklyNew.toLocaleString(), icon: <Plus className="text-cyan-500" /> },
     { label: '累计销售量', value: c.totalSalesVolume.toLocaleString(), icon: <TrendingUp className="text-green-500" /> },
     { label: '累计销售额', value: `¥${c.conversion.revenue.toLocaleString()}`, icon: <BarChart3 className="text-purple-500" /> },
-    { label: `${rangeLabel}销售量`, value: ((c as any).periodSales || 0).toLocaleString(), icon: <TrendingUp className="text-emerald-500" /> },
-    { label: `${rangeLabel}销售额`, value: `¥${((c as any).periodRevenue || 0).toLocaleString()}`, icon: <BarChart3 className="text-blue-600" /> },
-    { label: '课程学习人数', value: ((c as any).studentCount || 0).toLocaleString(), icon: <Users className="text-indigo-500" /> },
-    { label: '整体课时', value: `${(c as any).totalHours.toLocaleString()}h`, icon: <Clock className="text-orange-500" /> },
-    { label: '人均课时', value: `${(c as any).avgHours}h`, icon: <UserIcon className="text-blue-400" /> },
-    { label: '完课率', value: `${(c as any).completionRate}%`, icon: <CheckCircle2 className="text-emerald-500" /> },
+    { label: '累计课程学习人数', value: (c.studentCount || 0).toLocaleString(), icon: <Users className="text-indigo-500" /> },
+    { label: '累计课时', value: `${c.totalHours.toLocaleString()}h`, icon: <Clock className="text-orange-500" /> },
+    { label: '累计人均课时', value: `${c.avgHours}h`, icon: <UserIcon className="text-blue-400" /> },
+    { label: '累计完课率', value: `${c.completionRate}%`, icon: <CheckCircle2 className="text-emerald-500" /> },
+  ] : [
+    { label: `${rangeLabel}上架`, value: c.weeklyNew.toLocaleString(), icon: <Plus className="text-cyan-500" /> },
+    { label: `${rangeLabel}销售量`, value: (c.periodSales || 0).toLocaleString(), icon: <TrendingUp className="text-emerald-500" /> },
+    { label: `${rangeLabel}销售额`, value: `¥${(c.periodRevenue || 0).toLocaleString()}`, icon: <BarChart3 className="text-blue-600" /> },
+    { label: `${rangeLabel}课程学习人数`, value: Math.floor(c.studentCount * 0.15).toLocaleString(), icon: <Users className="text-indigo-400" /> },
+    { label: `${rangeLabel}课时`, value: `${Math.floor(c.totalHours * 1.5).toLocaleString()}h`, icon: <Clock className="text-orange-400" /> },
+    { label: `${rangeLabel}人均课时`, value: `${(c.avgHours * 1.2).toFixed(1)}h`, icon: <UserIcon className="text-blue-300" /> },
+    { label: `${rangeLabel}完课率`, value: `${(c.completionRate * 1.1).toFixed(1)}%`, icon: <CheckCircle2 className="text-emerald-400" /> },
   ];
 
   return (
@@ -7124,11 +7263,23 @@ function CourseDashboard() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
             <h2 className="text-2xl font-bold text-gray-800">整体数据</h2>
-            <DashboardInlineFilters 
-              filters={courseFilters} 
-              activeFilters={activeFilters} 
-              onFilterChange={handleFilterChange} 
-            />
+            <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100 ml-4">
+              {[
+                { id: 'added', name: '新增' },
+                { id: 'accumulated', name: '累计' }
+              ].map(mode => (
+                <button 
+                  key={mode.id}
+                  onClick={() => setStatMode(mode.id as any)}
+                  className={cn(
+                    "px-4 py-1.5 text-xs font-bold rounded-lg transition-all",
+                    statMode === mode.id ? "bg-white text-blue-600 shadow-sm" : "text-gray-400 hover:text-gray-600"
+                  )}
+                >
+                  {mode.name}
+                </button>
+              ))}
+            </div>
           </div>
           
           <div className="flex flex-wrap items-center gap-4">
@@ -7181,17 +7332,18 @@ function CourseDashboard() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        {/* Stats Cards Inside Same Container */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4">
           {stats.map((s, i) => (
-            <div key={i} className="bg-gray-50/50 p-6 rounded-2xl border border-gray-100/50 flex items-center gap-4 transition-all hover:bg-white hover:shadow-md group">
-              <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                <div className="scale-110">
+            <div key={i} className="bg-gray-50/50 p-4 rounded-3xl border border-gray-50 space-y-3 transition-all hover:bg-white hover:shadow-md hover:border-gray-100 group">
+              <div className="flex items-center justify-between">
+                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
                   {s.icon}
                 </div>
               </div>
               <div>
-                <p className="text-sm text-gray-400 font-medium">{s.label}</p>
-                <p className="text-2xl font-bold text-gray-800 mt-1">{s.value}</p>
+                <p className="text-[10px] text-gray-400 font-medium truncate">{s.label}</p>
+                <p className="text-lg font-bold text-gray-800 mt-1">{s.value}</p>
               </div>
             </div>
           ))}
@@ -7200,106 +7352,152 @@ function CourseDashboard() {
 
       {/* Section: Course Content Data */}
       <div className="space-y-6">
-        <div className="flex items-center gap-2">
-          <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
-          <h3 className="text-xl font-bold text-gray-800">课程内容数据</h3>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
+            <h3 className="text-xl font-bold text-gray-800">课程内容数据</h3>
+          </div>
+          <DashboardInlineFilters 
+            filters={courseFilters} 
+            activeFilters={activeFilters} 
+            onFilterChange={handleFilterChange} 
+          />
         </div>
         
-        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4">
-              <h3 className="text-lg font-bold text-gray-800">课程浏览数据 (PV/UV)</h3>
-              <button 
-                onClick={() => setShowBrowseData(true)}
-                className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
-              >
-                <FileText size={14} />
-                查看数据
-              </button>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-4">
+                <h3 className="text-lg font-bold text-gray-800">课程浏览数据 (PV/UV)</h3>
+                <button 
+                  onClick={() => setShowBrowseData(true)}
+                  className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                >
+                  <FileText size={14} />
+                  查看数据
+                </button>
+              </div>
+              <TimeRangeSelector range={browseRange} onChange={setBrowseRange} color="blue" />
             </div>
-            <TimeRangeSelector range={browseRange} onChange={setBrowseRange} color="blue" />
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={c.contentData.browsing[browseRange === 'week' || browseRange === 'month' ? 'month' : browseRange === 'custom' ? 'day' : browseRange]}>
+                  <defs>
+                    <linearGradient id="colorPv" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
+                  <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                  <YAxis axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                  <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
+                  <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
+                  <Area type="monotone" dataKey="pv" name="PV" stroke="#3B82F6" fill="url(#colorPv)" strokeWidth={3} />
+                  <Area type="monotone" dataKey="uv" name="UV" stroke="#10B981" fill="url(#colorUv)" strokeWidth={3} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={c.contentData.browsing[browseRange === 'week' || browseRange === 'month' ? 'month' : browseRange === 'custom' ? 'day' : browseRange]}>
-                <defs>
-                  <linearGradient id="colorPv" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
-                  </linearGradient>
-                  <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
-                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
-                <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
-                <Area type="monotone" dataKey="pv" name="PV" stroke="#3B82F6" fill="url(#colorPv)" strokeWidth={3} />
-                <Area type="monotone" dataKey="uv" name="UV" stroke="#10B981" fill="url(#colorUv)" strokeWidth={3} />
-              </AreaChart>
-            </ResponsiveContainer>
+
+          <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-4">
+                <h3 className="text-lg font-bold text-gray-800">课程咨询转化</h3>
+                <button 
+                  onClick={() => setShowEngagementData(true)}
+                  className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all"
+                >
+                  <FileText size={14} />
+                  查看数据
+                </button>
+              </div>
+              <TimeRangeSelector range={engagementRange} onChange={setEngagementRange} color="orange" />
+            </div>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={c.contentData.engagement[engagementRange === 'week' || engagementRange === 'month' ? 'month' : engagementRange === 'custom' ? 'day' : engagementRange]}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
+                  <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                  <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                  <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} unit="%" />
+                  <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
+                  <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
+                  <Line yAxisId="left" type="monotone" dataKey="inquiries" name="咨询数" stroke="#F59E0B" strokeWidth={3} dot={{r: 4}} />
+                  <Line yAxisId="left" type="monotone" dataKey="sales" name="销售数" stroke="#EF4444" strokeWidth={3} dot={{r: 4}} />
+                  <Line yAxisId="right" type="monotone" dataKey="rate" name="咨询转化率" stroke="#8B5CF6" strokeWidth={2} dot={{r: 4}} strokeDasharray="5 5" />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm lg:col-span-2">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-4">
+                <h3 className="text-lg font-bold text-gray-800">课程学习数据</h3>
+                <button 
+                  onClick={() => setShowLearningData(true)}
+                  className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
+                >
+                  <FileText size={14} />
+                  查看数据
+                </button>
+              </div>
+              <TimeRangeSelector range={learningRange} onChange={setLearningRange} color="emerald" />
+            </div>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={(c.contentData as any).learning[learningRange === 'week' || learningRange === 'month' ? 'month' : learningRange === 'custom' ? 'day' : learningRange]}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
+                  <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                  <YAxis axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                  <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
+                  <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
+                  <Line type="monotone" dataKey="joined" name="加入人数" stroke="#3B82F6" strokeWidth={3} dot={{r: 4}} />
+                  <Line type="monotone" dataKey="completed" name="完课人数" stroke="#10B981" strokeWidth={3} dot={{r: 4}} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
+      </div>
 
+      {/* Section: Course Sales Data */}
+      <div className="space-y-6">
+        <div className="flex items-center gap-2">
+          <div className="w-1 h-6 bg-green-600 rounded-full"></div>
+          <h3 className="text-xl font-bold text-gray-800">课程销售数据</h3>
+        </div>
         <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <h3 className="text-lg font-bold text-gray-800">课程咨询转化</h3>
+              <h3 className="text-lg font-bold text-gray-800">销售趋势</h3>
               <button 
-                onClick={() => setShowEngagementData(true)}
-                className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all"
+                onClick={() => setShowSalesData(true)}
+                className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
               >
                 <FileText size={14} />
                 查看数据
               </button>
             </div>
-            <TimeRangeSelector range={engagementRange} onChange={setEngagementRange} color="orange" />
+            <TimeRangeSelector range={salesRange} onChange={setSalesRange} color="green" />
           </div>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={c.contentData.engagement[engagementRange === 'week' || engagementRange === 'month' ? 'month' : engagementRange === 'custom' ? 'day' : engagementRange]}>
+              <AreaChart data={c.salesTrend[salesRange === 'week' || salesRange === 'month' ? 'month' : salesRange === 'custom' ? 'day' : salesRange]}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
                 <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
                 <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} unit="%" />
+                <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
                 <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
                 <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
-                <Line yAxisId="left" type="monotone" dataKey="inquiries" name="咨询数" stroke="#F59E0B" strokeWidth={3} dot={{r: 4}} />
-                <Line yAxisId="left" type="monotone" dataKey="sales" name="销售数" stroke="#EF4444" strokeWidth={3} dot={{r: 4}} />
-                <Line yAxisId="right" type="monotone" dataKey="rate" name="咨询转化率" stroke="#8B5CF6" strokeWidth={2} dot={{r: 4}} strokeDasharray="5 5" />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4">
-              <h3 className="text-lg font-bold text-gray-800">课程学习数据</h3>
-              <button 
-                onClick={() => setShowLearningData(true)}
-                className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
-              >
-                <FileText size={14} />
-                查看数据
-              </button>
-            </div>
-            <TimeRangeSelector range={learningRange} onChange={setLearningRange} color="emerald" />
-          </div>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={(c.contentData as any).learning[learningRange === 'week' || learningRange === 'month' ? 'month' : learningRange === 'custom' ? 'day' : learningRange]}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
-                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
-                <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
-                <Bar dataKey="joined" name="加入人数" fill="#3B82F6" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="completed" name="完课人数" fill="#10B981" radius={[4, 4, 0, 0]} />
-              </BarChart>
+                <Area yAxisId="left" type="monotone" dataKey="sales" name="销量" stroke="#10B981" fill="#10B981" fillOpacity={0.1} strokeWidth={3} />
+                <Area yAxisId="right" type="monotone" dataKey="revenue" name="销售额" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.1} strokeWidth={3} />
+              </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
@@ -7361,7 +7559,8 @@ function CourseDashboard() {
               <option value="pv">按PV</option>
               <option value="uv">按UV</option>
               <option value="inquiries">按咨询</option>
-              <option value="sales">按销售</option>
+              <option value="sales">按销售量</option>
+              <option value="revenue">按销售额</option>
             </select>
           </div>
 
@@ -7378,7 +7577,7 @@ function CourseDashboard() {
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-sm font-medium text-gray-700">{item.name}</span>
                     <span className="text-sm font-bold text-gray-900">
-                      {rankingSort === 'count' ? `${item.count}门` : item[rankingSort].toLocaleString()}
+                      {rankingSort === 'revenue' ? `¥${item.revenue.toLocaleString()}` : item[rankingSort].toLocaleString()}
                     </span>
                   </div>
                   <div className="w-full h-2 bg-gray-50 rounded-full overflow-hidden">
@@ -7395,42 +7594,17 @@ function CourseDashboard() {
         </div>
       </div>
 
-      {/* Section: Course Sales Data */}
-      <div className="space-y-6">
-        <div className="flex items-center gap-2">
-          <div className="w-1 h-6 bg-green-600 rounded-full"></div>
-          <h3 className="text-xl font-bold text-gray-800">课程销售数据</h3>
-        </div>
-        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4">
-              <h3 className="text-lg font-bold text-gray-800">销售趋势</h3>
-              <button 
-                onClick={() => setShowSalesData(true)}
-                className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
-              >
-                <FileText size={14} />
-                查看数据
-              </button>
-            </div>
-            <TimeRangeSelector range={salesRange} onChange={setSalesRange} color="green" />
-          </div>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={c.salesTrend[salesRange === 'week' || salesRange === 'month' ? 'month' : salesRange === 'custom' ? 'day' : salesRange]}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
-                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
-                <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
-                <Area yAxisId="left" type="monotone" dataKey="sales" name="销量" stroke="#10B981" fill="#10B981" fillOpacity={0.1} strokeWidth={3} />
-                <Area yAxisId="right" type="monotone" dataKey="revenue" name="销售额" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.1} strokeWidth={3} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
+      <DataViewModal 
+        isOpen={showSalesData}
+        onClose={() => setShowSalesData(false)}
+        title="课程销售数据"
+        data={c.salesTrend[salesRange === 'week' || salesRange === 'month' ? 'month' : salesRange === 'custom' ? 'day' : salesRange]}
+        columns={[
+          { key: 'date', label: '日期' },
+          { key: 'sales', label: '销量' },
+          { key: 'revenue', label: '销售额', format: (v) => `¥${v.toLocaleString()}` }
+        ]}
+      />
 
       <DataViewModal 
         isOpen={showBrowseData}
@@ -7447,13 +7621,13 @@ function CourseDashboard() {
       <DataViewModal 
         isOpen={showEngagementData}
         onClose={() => setShowEngagementData(false)}
-        title="课程咨询转化"
+        title="课程咨询转化数据"
         data={c.contentData.engagement[engagementRange === 'week' || engagementRange === 'month' ? 'month' : engagementRange === 'custom' ? 'day' : engagementRange]}
         columns={[
           { key: 'date', label: '日期' },
           { key: 'inquiries', label: '咨询数' },
-          { key: 'sales', label: '销售数' },
-          { key: 'rate', label: '咨询转化率 (%)' }
+          { key: 'sales', label: '订单数' },
+          { key: 'rate', label: '咨询转化率', format: (v) => `${v}%` }
         ]}
       />
 
@@ -7468,18 +7642,6 @@ function CourseDashboard() {
           { key: 'completed', label: '完课人数' }
         ]}
       />
-
-      <DataViewModal 
-        isOpen={showSalesData}
-        onClose={() => setShowSalesData(false)}
-        title="课程销售数据"
-        data={c.salesTrend[salesRange === 'week' || salesRange === 'month' ? 'month' : salesRange === 'custom' ? 'day' : salesRange]}
-        columns={[
-          { key: 'date', label: '日期' },
-          { key: 'sales', label: '销量' },
-          { key: 'revenue', label: '销售额' }
-        ]}
-      />
     </div>
   );
 }
@@ -7487,6 +7649,7 @@ function CourseDashboard() {
 function ClassDashboard() {
   const [globalRange, setGlobalRange] = useState<'day' | 'week' | 'month'>('week');
   const [selectedSubValue, setSelectedSubValue] = useState('2023-W16');
+  const [statMode, setStatMode] = useState<'added' | 'accumulated'>('added');
 
   useEffect(() => {
     if (globalRange === 'day') setSelectedSubValue('2023-04-21');
@@ -7500,7 +7663,7 @@ function ClassDashboard() {
   const [salesRange, setSalesRange] = useState<'day' | 'week' | 'month' | 'custom'>('day');
   const [rankingType, setRankingType] = useState<'domain' | 'position' | 'certification'>('domain');
   const [rankingRange, setRankingRange] = useState<'week' | 'month' | 'total'>('total');
-  const [rankingSort, setRankingSort] = useState<'count' | 'pv' | 'uv' | 'inquiries' | 'sales'>('count');
+  const [rankingSort, setRankingSort] = useState<'count' | 'pv' | 'uv' | 'inquiries' | 'sales' | 'revenue'>('count');
   const [showBrowseData, setShowBrowseData] = useState(false);
   const [showEngagementData, setShowEngagementData] = useState(false);
   const [showLearningData, setShowLearningData] = useState(false);
@@ -7525,16 +7688,20 @@ function ClassDashboard() {
 
   const rangeLabel = globalRange === 'day' ? '本日' : globalRange === 'week' ? '本周' : '本月';
 
-  const stats = [
-    { label: '累计上架', value: c.totalPublished.toLocaleString(), icon: <BookOpen className="text-blue-500" /> },
-    { label: `${rangeLabel}新增`, value: c.weeklyNew.toLocaleString(), icon: <Plus className="text-cyan-500" /> },
+  const stats = statMode === 'accumulated' ? [
+    { label: '累计上架', value: `${c.totalPublished.toLocaleString()} (付费${Math.floor(c.totalPublished*0.6)} / 免费${Math.floor(c.totalPublished*0.4)})`, icon: <BookOpen className="text-blue-500" /> },
     { label: '累计销售量', value: c.totalSalesVolume.toLocaleString(), icon: <TrendingUp className="text-green-500" /> },
     { label: '累计销售额', value: `¥${c.conversion.revenue.toLocaleString()}`, icon: <BarChart3 className="text-purple-500" /> },
-    { label: `${rangeLabel}销售量`, value: ((c as any).periodSales || 0).toLocaleString(), icon: <TrendingUp className="text-emerald-500" /> },
-    { label: `${rangeLabel}销售额`, value: `¥${((c as any).periodRevenue || 0).toLocaleString()}`, icon: <BarChart3 className="text-blue-600" /> },
-    { label: '班级毕业人数', value: `${(c as any).totalHours.toLocaleString()}人`, icon: <Clock className="text-orange-500" /> },
-    { label: '人均课时', value: `${(c as any).avgHours}h`, icon: <UserIcon className="text-blue-400" /> },
-    { label: '通过率', value: `${(c as any).completionRate}%`, icon: <CheckCircle2 className="text-emerald-500" /> },
+    { label: '累计班级学习人数', value: (c.studentCount || 0).toLocaleString(), icon: <Users className="text-indigo-500" /> },
+    { label: '累计班级毕业人数', value: `${(c as any).graduatedCount || 0}人`, icon: <CheckCircle2 className="text-emerald-500" /> },
+    { label: '累计通过率', value: `${(c as any).passRate || 0}%`, icon: <Award className="text-orange-500" /> },
+  ] : [
+    { label: `${rangeLabel}上架`, value: `${c.weeklyNew.toLocaleString()} (付费${Math.floor(c.weeklyNew*0.7)} / 免费${Math.floor(c.weeklyNew*0.3)})`, icon: <Plus className="text-cyan-500" /> },
+    { label: `${rangeLabel}销售量`, value: (c.periodSales || 0).toLocaleString(), icon: <TrendingUp className="text-emerald-500" /> },
+    { label: `${rangeLabel}销售额`, value: `¥${(c.periodRevenue || 0).toLocaleString()}`, icon: <BarChart3 className="text-blue-600" /> },
+    { label: `${rangeLabel}班级学习人数`, value: Math.floor(c.studentCount * 0.12).toLocaleString(), icon: <Users className="text-indigo-400" /> },
+    { label: `${rangeLabel}班级毕业人数`, value: `${Math.floor(((c as any).graduatedCount || 0) * 0.1)}人`, icon: <CheckCircle2 className="text-emerald-400" /> },
+    { label: `${rangeLabel}通过率`, value: `${((c as any).passRate || 0) + 1.5}%`, icon: <Award className="text-orange-400" /> },
   ];
 
   return (
@@ -7544,11 +7711,23 @@ function ClassDashboard() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
             <h2 className="text-2xl font-bold text-gray-800">整体数据</h2>
-            <DashboardInlineFilters 
-              filters={DASHBOARD_FILTER_OPTIONS.class} 
-              activeFilters={activeFilters} 
-              onFilterChange={handleFilterChange} 
-            />
+            <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100 ml-4">
+              {[
+                { id: 'added', name: '新增' },
+                { id: 'accumulated', name: '累计' }
+              ].map(mode => (
+                <button 
+                  key={mode.id}
+                  onClick={() => setStatMode(mode.id as any)}
+                  className={cn(
+                    "px-4 py-1.5 text-xs font-bold rounded-lg transition-all",
+                    statMode === mode.id ? "bg-white text-blue-600 shadow-sm" : "text-gray-400 hover:text-gray-600"
+                  )}
+                >
+                  {mode.name}
+                </button>
+              ))}
+            </div>
           </div>
           
           <div className="flex flex-wrap items-center gap-4">
@@ -7601,17 +7780,17 @@ function ClassDashboard() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           {stats.map((s, i) => (
-            <div key={i} className="bg-gray-50/50 p-6 rounded-2xl border border-gray-100/50 flex items-center gap-4 transition-all hover:bg-white hover:shadow-md group">
-              <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                <div className="scale-110">
+            <div key={i} className="bg-gray-50/50 p-4 rounded-3xl border border-gray-50 space-y-3 transition-all hover:bg-white hover:shadow-md hover:border-gray-100 group">
+              <div className="flex items-center justify-between">
+                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
                   {s.icon}
                 </div>
               </div>
               <div>
-                <p className="text-sm text-gray-400 font-medium">{s.label}</p>
-                <p className="text-2xl font-bold text-gray-800 mt-1">{s.value}</p>
+                <p className="text-[10px] text-gray-400 font-medium truncate">{s.label}</p>
+                <p className="text-lg font-bold text-gray-800 mt-1">{s.value}</p>
               </div>
             </div>
           ))}
@@ -7620,106 +7799,152 @@ function ClassDashboard() {
 
       {/* Section: Class Content Data */}
       <div className="space-y-6">
-        <div className="flex items-center gap-2">
-          <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
-          <h3 className="text-xl font-bold text-gray-800">班级内容数据</h3>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
+            <h3 className="text-xl font-bold text-gray-800">班级内容数据</h3>
+          </div>
+          <DashboardInlineFilters 
+            filters={DASHBOARD_FILTER_OPTIONS.class} 
+            activeFilters={activeFilters} 
+            onFilterChange={handleFilterChange} 
+          />
         </div>
         
-        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4">
-              <h3 className="text-lg font-bold text-gray-800">班级浏览数据 (PV/UV)</h3>
-              <button 
-                onClick={() => setShowBrowseData(true)}
-                className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
-              >
-                <FileText size={14} />
-                查看数据
-              </button>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-4">
+                <h3 className="text-lg font-bold text-gray-800">班级浏览数据 (PV/UV)</h3>
+                <button 
+                  onClick={() => setShowBrowseData(true)}
+                  className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                >
+                  <FileText size={14} />
+                  查看数据
+                </button>
+              </div>
+              <TimeRangeSelector range={browseRange} onChange={setBrowseRange} color="blue" />
             </div>
-            <TimeRangeSelector range={browseRange} onChange={setBrowseRange} color="blue" />
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={c.contentData.browsing[browseRange === 'week' || browseRange === 'month' ? 'month' : browseRange === 'custom' ? 'day' : browseRange]}>
+                  <defs>
+                    <linearGradient id="colorClassPv" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="colorClassUv" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
+                  <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                  <YAxis axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                  <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
+                  <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
+                  <Area type="monotone" dataKey="pv" name="PV" stroke="#3B82F6" fill="url(#colorClassPv)" strokeWidth={3} />
+                  <Area type="monotone" dataKey="uv" name="UV" stroke="#10B981" fill="url(#colorClassUv)" strokeWidth={3} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={c.contentData.browsing[browseRange === 'week' || browseRange === 'month' ? 'month' : browseRange === 'custom' ? 'day' : browseRange]}>
-                <defs>
-                  <linearGradient id="colorClassPv" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
-                  </linearGradient>
-                  <linearGradient id="colorClassUv" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
-                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
-                <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
-                <Area type="monotone" dataKey="pv" name="PV" stroke="#3B82F6" fill="url(#colorClassPv)" strokeWidth={3} />
-                <Area type="monotone" dataKey="uv" name="UV" stroke="#10B981" fill="url(#colorClassUv)" strokeWidth={3} />
-              </AreaChart>
-            </ResponsiveContainer>
+
+          <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-4">
+                <h3 className="text-lg font-bold text-gray-800">班级咨询转化</h3>
+                <button 
+                  onClick={() => setShowEngagementData(true)}
+                  className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all"
+                >
+                  <FileText size={14} />
+                  查看数据
+                </button>
+              </div>
+              <TimeRangeSelector range={engagementRange} onChange={setEngagementRange} color="orange" />
+            </div>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={c.contentData.engagement[engagementRange === 'week' || engagementRange === 'month' ? 'month' : engagementRange === 'custom' ? 'day' : engagementRange]}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
+                  <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                  <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                  <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} unit="%" />
+                  <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
+                  <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
+                  <Line yAxisId="left" type="monotone" dataKey="inquiries" name="咨询数" stroke="#F59E0B" strokeWidth={3} dot={{r: 4}} />
+                  <Line yAxisId="left" type="monotone" dataKey="sales" name="销售数" stroke="#EF4444" strokeWidth={3} dot={{r: 4}} />
+                  <Line yAxisId="right" type="monotone" dataKey="rate" name="咨询转化率" stroke="#8B5CF6" strokeWidth={2} dot={{r: 4}} strokeDasharray="5 5" />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm lg:col-span-2">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-4">
+                <h3 className="text-lg font-bold text-gray-800">班级学习数据</h3>
+                <button 
+                  onClick={() => setShowLearningData(true)}
+                  className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
+                >
+                  <FileText size={14} />
+                  查看数据
+                </button>
+              </div>
+              <TimeRangeSelector range={learningRange} onChange={setLearningRange} color="emerald" />
+            </div>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={(c.contentData as any).learning[learningRange === 'week' || learningRange === 'month' ? 'month' : learningRange === 'custom' ? 'day' : learningRange]}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
+                  <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                  <YAxis axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                  <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
+                  <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
+                  <Line type="monotone" dataKey="joined" name="加入人数" stroke="#3B82F6" strokeWidth={3} dot={{r: 4}} />
+                  <Line type="monotone" dataKey="completed" name="毕业人数" stroke="#10B981" strokeWidth={3} dot={{r: 4}} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
+      </div>
 
+      {/* Section: Class Sales Data */}
+      <div className="space-y-6">
+        <div className="flex items-center gap-2">
+          <div className="w-1 h-6 bg-green-600 rounded-full"></div>
+          <h3 className="text-xl font-bold text-gray-800">班级销售数据</h3>
+        </div>
         <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <h3 className="text-lg font-bold text-gray-800">班级咨询转化</h3>
+              <h3 className="text-lg font-bold text-gray-800">销售趋势</h3>
               <button 
-                onClick={() => setShowEngagementData(true)}
-                className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all"
+                onClick={() => setShowSalesData(true)}
+                className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
               >
                 <FileText size={14} />
                 查看数据
               </button>
             </div>
-            <TimeRangeSelector range={engagementRange} onChange={setEngagementRange} color="orange" />
+            <TimeRangeSelector range={salesRange} onChange={setSalesRange} color="green" />
           </div>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={c.contentData.engagement[engagementRange === 'week' || engagementRange === 'month' ? 'month' : engagementRange === 'custom' ? 'day' : engagementRange]}>
+              <AreaChart data={c.salesTrend[salesRange === 'week' || salesRange === 'month' ? 'month' : salesRange === 'custom' ? 'day' : salesRange]}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
                 <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
                 <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} unit="%" />
+                <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
                 <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
                 <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
-                <Line yAxisId="left" type="monotone" dataKey="inquiries" name="咨询数" stroke="#F59E0B" strokeWidth={3} dot={{r: 4}} />
-                <Line yAxisId="left" type="monotone" dataKey="sales" name="销售数" stroke="#EF4444" strokeWidth={3} dot={{r: 4}} />
-                <Line yAxisId="right" type="monotone" dataKey="rate" name="咨询转化率" stroke="#8B5CF6" strokeWidth={2} dot={{r: 4}} strokeDasharray="5 5" />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4">
-              <h3 className="text-lg font-bold text-gray-800">班级学习数据</h3>
-              <button 
-                onClick={() => setShowLearningData(true)}
-                className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
-              >
-                <FileText size={14} />
-                查看数据
-              </button>
-            </div>
-            <TimeRangeSelector range={learningRange} onChange={setLearningRange} color="emerald" />
-          </div>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={(c.contentData as any).learning[learningRange === 'week' || learningRange === 'month' ? 'month' : learningRange === 'custom' ? 'day' : learningRange]}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
-                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
-                <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
-                <Bar dataKey="joined" name="加入人数" fill="#3B82F6" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="completed" name="毕业人数" fill="#10B981" radius={[4, 4, 0, 0]} />
-              </BarChart>
+                <Area yAxisId="left" type="monotone" dataKey="sales" name="销量" stroke="#10B981" fill="#10B981" fillOpacity={0.1} strokeWidth={3} />
+                <Area yAxisId="right" type="monotone" dataKey="revenue" name="销售额" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.1} strokeWidth={3} />
+              </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
@@ -7781,7 +8006,8 @@ function ClassDashboard() {
               <option value="pv">按PV</option>
               <option value="uv">按UV</option>
               <option value="inquiries">按咨询</option>
-              <option value="sales">按销售</option>
+              <option value="sales">按销售量</option>
+              <option value="revenue">按销售额</option>
             </select>
           </div>
 
@@ -7798,7 +8024,7 @@ function ClassDashboard() {
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-sm font-medium text-gray-700">{item.name}</span>
                     <span className="text-sm font-bold text-gray-900">
-                      {rankingSort === 'count' ? `${item.count}个` : item[rankingSort].toLocaleString()}
+                      {rankingSort === 'revenue' ? `¥${item.revenue.toLocaleString()}` : item[rankingSort].toLocaleString()}
                     </span>
                   </div>
                   <div className="w-full h-2 bg-gray-50 rounded-full overflow-hidden">
@@ -7815,42 +8041,17 @@ function ClassDashboard() {
         </div>
       </div>
 
-      {/* Section: Class Sales Data */}
-      <div className="space-y-6">
-        <div className="flex items-center gap-2">
-          <div className="w-1 h-6 bg-green-600 rounded-full"></div>
-          <h3 className="text-xl font-bold text-gray-800">班级销售数据</h3>
-        </div>
-        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4">
-              <h3 className="text-lg font-bold text-gray-800">销售趋势</h3>
-              <button 
-                onClick={() => setShowSalesData(true)}
-                className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
-              >
-                <FileText size={14} />
-                查看数据
-              </button>
-            </div>
-            <TimeRangeSelector range={salesRange} onChange={setSalesRange} color="green" />
-          </div>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={c.salesTrend[salesRange === 'week' || salesRange === 'month' ? 'month' : salesRange === 'custom' ? 'day' : salesRange]}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
-                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
-                <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
-                <Area yAxisId="left" type="monotone" dataKey="sales" name="销量" stroke="#10B981" fill="#10B981" fillOpacity={0.1} strokeWidth={3} />
-                <Area yAxisId="right" type="monotone" dataKey="revenue" name="销售额" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.1} strokeWidth={3} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
+      <DataViewModal 
+        isOpen={showSalesData}
+        onClose={() => setShowSalesData(false)}
+        title="班级销售数据"
+        data={c.salesTrend[salesRange === 'week' || salesRange === 'month' ? 'month' : salesRange === 'custom' ? 'day' : salesRange]}
+        columns={[
+          { key: 'date', label: '日期' },
+          { key: 'sales', label: '销量' },
+          { key: 'revenue', label: '销售额', format: (v) => `¥${v.toLocaleString()}` }
+        ]}
+      />
 
       <DataViewModal 
         isOpen={showBrowseData}
@@ -7867,13 +8068,13 @@ function ClassDashboard() {
       <DataViewModal 
         isOpen={showEngagementData}
         onClose={() => setShowEngagementData(false)}
-        title="班级咨询转化"
+        title="班级咨询转化数据"
         data={c.contentData.engagement[engagementRange === 'week' || engagementRange === 'month' ? 'month' : engagementRange === 'custom' ? 'day' : engagementRange]}
         columns={[
           { key: 'date', label: '日期' },
           { key: 'inquiries', label: '咨询数' },
-          { key: 'sales', label: '销售数' },
-          { key: 'rate', label: '咨询转化率 (%)' }
+          { key: 'sales', label: '订单数' },
+          { key: 'rate', label: '咨询转化率', format: (v) => `${v}%` }
         ]}
       />
 
@@ -7884,20 +8085,8 @@ function ClassDashboard() {
         data={(c.contentData as any).learning[learningRange === 'week' || learningRange === 'month' ? 'month' : learningRange === 'custom' ? 'day' : learningRange]}
         columns={[
           { key: 'date', label: '日期' },
-          { key: 'joined', label: '加入人数' },
+          { key: 'joined', label: '加入学习人数' },
           { key: 'completed', label: '毕业人数' }
-        ]}
-      />
-
-      <DataViewModal 
-        isOpen={showSalesData}
-        onClose={() => setShowSalesData(false)}
-        title="班级销售数据"
-        data={c.salesTrend[salesRange === 'week' || salesRange === 'month' ? 'month' : salesRange === 'custom' ? 'day' : salesRange]}
-        columns={[
-          { key: 'date', label: '日期' },
-          { key: 'sales', label: '销量' },
-          { key: 'revenue', label: '销售额' }
         ]}
       />
     </div>
@@ -7907,6 +8096,7 @@ function ClassDashboard() {
 function CertDashboard() {
   const [globalRange, setGlobalRange] = useState<'day' | 'week' | 'month'>('week');
   const [selectedSubValue, setSelectedSubValue] = useState('2023-W16');
+  const [statMode, setStatMode] = useState<'added' | 'accumulated'>('added');
 
   useEffect(() => {
     if (globalRange === 'day') setSelectedSubValue('2023-04-21');
@@ -7919,7 +8109,7 @@ function CertDashboard() {
   const [learningRange, setLearningRange] = useState<'day' | 'week' | 'month' | 'custom'>('day');
   const [salesRange, setSalesRange] = useState<'day' | 'week' | 'month' | 'custom'>('day');
   const [rankingRange, setRankingRange] = useState<'week' | 'month' | 'total'>('total');
-  const [rankingSort, setRankingSort] = useState<'count' | 'pv' | 'uv' | 'inquiries' | 'sales'>('count');
+  const [rankingSort, setRankingSort] = useState<'count' | 'pv' | 'uv' | 'inquiries' | 'sales' | 'revenue'>('count');
   const [showBrowseData, setShowBrowseData] = useState(false);
   const [showEngagementData, setShowEngagementData] = useState(false);
   const [showLearningData, setShowLearningData] = useState(false);
@@ -7956,17 +8146,20 @@ function CertDashboard() {
 
   const rangeLabel = globalRange === 'day' ? '本日' : globalRange === 'week' ? '本周' : '本月';
 
-  const stats = [
+  const stats = statMode === 'accumulated' ? [
     { label: '累计颁发', value: c.totalIssued.toLocaleString(), icon: <FileCheck className="text-blue-500" /> },
     { label: '累计上架', value: c.totalPublished.toLocaleString(), icon: <BookOpen className="text-emerald-500" /> },
-    { label: '累计销量', value: c.totalSalesVolume.toLocaleString(), icon: <TrendingUp className="text-blue-600" /> },
+    { label: '累计销售量', value: c.totalSalesVolume.toLocaleString(), icon: <TrendingUp className="text-blue-600" /> },
     { label: '累计销售额', value: `¥${c.conversion.revenue.toLocaleString()}`, icon: <BarChart3 className="text-purple-500" /> },
-    { label: `${rangeLabel}新增`, value: c.weeklyNew.toLocaleString(), icon: <Plus className="text-cyan-500" /> },
-    { label: `${rangeLabel}销售项`, value: c.periodSales.toLocaleString(), icon: <TrendingUp className="text-emerald-500" /> },
-    { label: `${rangeLabel}销售额`, value: `¥${c.periodRevenue.toLocaleString()}`, icon: <BarChart3 className="text-blue-600" /> },
     { label: '累计学习人数', value: (c as any).studentCount.toLocaleString(), icon: <Users className="text-indigo-500" /> },
-    { label: '证书获取率', value: `${(c as any).acquisitionRate}%`, icon: <CheckCircle2 className="text-emerald-600" /> },
-    { label: '平均获取周期', value: '14天', icon: <Clock className="text-orange-500" /> },
+    { label: '累计获取率', value: `${(c as any).acquisitionRate}%`, icon: <CheckCircle2 className="text-emerald-600" /> },
+  ] : [
+    { label: `${rangeLabel}颁发`, value: Math.floor(c.totalIssued * 0.1).toLocaleString(), icon: <FileCheck className="text-blue-400" /> },
+    { label: `${rangeLabel}上架`, value: c.weeklyNew.toLocaleString(), icon: <Plus className="text-cyan-500" /> },
+    { label: `${rangeLabel}销售量`, value: c.periodSales.toLocaleString(), icon: <TrendingUp className="text-emerald-500" /> },
+    { label: `${rangeLabel}销售额`, value: `¥${c.periodRevenue.toLocaleString()}`, icon: <BarChart3 className="text-blue-600" /> },
+    { label: `${rangeLabel}学习人数`, value: Math.floor((c as any).studentCount * 0.15).toLocaleString(), icon: <Users className="text-indigo-400" /> },
+    { label: `${rangeLabel}获取率`, value: `${((c as any).acquisitionRate || 0) + 1.2}%`, icon: <CheckCircle2 className="text-emerald-400" /> },
   ];
 
   return (
@@ -7976,33 +8169,27 @@ function CertDashboard() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
             <h2 className="text-2xl font-bold text-gray-800">整体数据</h2>
-            <DashboardInlineFilters 
-              filters={certFilters} 
-              activeFilters={activeFilters} 
-              onFilterChange={handleFilterChange} 
-            />
-          </div>
-          
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
+            <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100 ml-4">
               {[
-                { id: 'day', name: '按日' },
-                { id: 'week', name: '按周' },
-                { id: 'month', name: '按月' }
-              ].map(r => (
+                { id: 'added', name: '新增' },
+                { id: 'accumulated', name: '累计' }
+              ].map(mode => (
                 <button 
-                  key={r.id}
-                  onClick={() => setGlobalRange(r.id as any)}
+                  key={mode.id}
+                  onClick={() => setStatMode(mode.id as any)}
                   className={cn(
                     "px-4 py-1.5 text-xs font-bold rounded-lg transition-all",
-                    globalRange === r.id ? "bg-white text-blue-600 shadow-sm" : "text-gray-400 hover:text-gray-600"
+                    statMode === mode.id ? "bg-white text-blue-600 shadow-sm" : "text-gray-400 hover:text-gray-600"
                   )}
                 >
-                  {r.name}
+                  {mode.name}
                 </button>
               ))}
             </div>
-
+          </div>
+          
+          <div className="flex flex-wrap items-center gap-4">
+            <TimeRangeSelector range={globalRange} onChange={setGlobalRange} />
             <select 
               value={selectedSubValue}
               onChange={(e) => setSelectedSubValue(e.target.value)}
@@ -8030,17 +8217,17 @@ function CertDashboard() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           {stats.map((s, i) => (
-            <div key={i} className="bg-gray-50/50 p-6 rounded-2xl border border-gray-100/50 flex items-center gap-4 transition-all hover:bg-white hover:shadow-md group">
-              <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                <div className="scale-110">
+            <div key={i} className="bg-gray-50/50 p-4 rounded-3xl border border-gray-50 space-y-3 transition-all hover:bg-white hover:shadow-md hover:border-gray-100 group">
+              <div className="flex items-center justify-between">
+                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
                   {s.icon}
                 </div>
               </div>
               <div>
-                <p className="text-sm text-gray-400 font-medium">{s.label}</p>
-                <p className="text-2xl font-bold text-gray-800 mt-1">{s.value}</p>
+                <p className="text-[10px] text-gray-400 font-medium truncate">{s.label}</p>
+                <p className="text-lg font-bold text-gray-800 mt-1">{s.value}</p>
               </div>
             </div>
           ))}
@@ -8049,106 +8236,153 @@ function CertDashboard() {
 
       {/* Section: Cert Content Data */}
       <div className="space-y-6">
-        <div className="flex items-center gap-2">
-          <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
-          <h3 className="text-xl font-bold text-gray-800">证书内容数据</h3>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
+            <h3 className="text-xl font-bold text-gray-800">证书内容数据</h3>
+          </div>
+          <DashboardInlineFilters 
+            filters={certFilters} 
+            activeFilters={activeFilters} 
+            onFilterChange={handleFilterChange} 
+          />
         </div>
         
-        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4">
-              <h3 className="text-lg font-bold text-gray-800">证书浏览数据 (PV/UV)</h3>
-              <button 
-                onClick={() => setShowBrowseData(true)}
-                className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
-              >
-                <FileText size={14} />
-                查看数据
-              </button>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-4">
+                <h3 className="text-lg font-bold text-gray-800">证书浏览数据 (PV/UV)</h3>
+                <button 
+                  onClick={() => setShowBrowseData(true)}
+                  className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                >
+                  <FileText size={14} />
+                  查看数据
+                </button>
+              </div>
+              <TimeRangeSelector range={browseRange} onChange={setBrowseRange} color="blue" />
             </div>
-            <TimeRangeSelector range={browseRange} onChange={setBrowseRange} color="blue" />
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={c.contentData.browsing[browseRange === 'week' || browseRange === 'month' ? 'month' : browseRange === 'custom' ? 'day' : browseRange]}>
+                  <defs>
+                    <linearGradient id="colorCertPv" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="colorCertUv" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
+                  <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                  <YAxis axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                  <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
+                  <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
+                  <Area type="monotone" dataKey="pv" name="PV" stroke="#3B82F6" fill="url(#colorCertPv)" strokeWidth={3} />
+                  <Area type="monotone" dataKey="uv" name="UV" stroke="#10B981" fill="url(#colorCertUv)" strokeWidth={3} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={c.contentData.browsing[browseRange === 'week' || browseRange === 'month' ? 'month' : browseRange === 'custom' ? 'day' : browseRange]}>
-                <defs>
-                  <linearGradient id="colorCertPv" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
-                  </linearGradient>
-                  <linearGradient id="colorCertUv" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
-                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
-                <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
-                <Area type="monotone" dataKey="pv" name="PV" stroke="#3B82F6" fill="url(#colorCertPv)" strokeWidth={3} />
-                <Area type="monotone" dataKey="uv" name="UV" stroke="#10B981" fill="url(#colorCertUv)" strokeWidth={3} />
-              </AreaChart>
-            </ResponsiveContainer>
+
+          <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-4">
+                <h3 className="text-lg font-bold text-gray-800">证书咨询转化</h3>
+                <button 
+                  onClick={() => setShowEngagementData(true)}
+                  className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all"
+                >
+                  <FileText size={14} />
+                  查看数据
+                </button>
+              </div>
+              <TimeRangeSelector range={engagementRange} onChange={setEngagementRange} color="orange" />
+            </div>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={c.contentData.engagement[engagementRange === 'week' || engagementRange === 'month' ? 'month' : engagementRange === 'custom' ? 'day' : engagementRange]}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
+                  <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                  <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                  <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} unit="%" />
+                  <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
+                  <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
+                  <Line yAxisId="left" type="monotone" dataKey="inquiries" name="咨询数" stroke="#F59E0B" strokeWidth={3} dot={{r: 4}} />
+                  <Line yAxisId="left" type="monotone" dataKey="sales" name="销售数" stroke="#EF4444" strokeWidth={3} dot={{r: 4}} />
+                  <Line yAxisId="right" type="monotone" dataKey="rate" name="咨询转化率" stroke="#8B5CF6" strokeWidth={2} dot={{r: 4}} strokeDasharray="5 5" />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm lg:col-span-2">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-4">
+                <h3 className="text-lg font-bold text-gray-800">证书获取数据</h3>
+                <button 
+                  onClick={() => setShowLearningData(true)}
+                  className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
+                >
+                  <FileText size={14} />
+                  查看数据
+                </button>
+              </div>
+              <TimeRangeSelector range={learningRange} onChange={setLearningRange} color="emerald" />
+            </div>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={(c.contentData as any).acquisition[learningRange === 'week' || learningRange === 'month' ? 'month' : learningRange === 'custom' ? 'day' : learningRange]}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
+                  <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                  <YAxis axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                  <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
+                  <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
+                  <Line type="monotone" dataKey="joined" name="加入人数" stroke="#3B82F6" strokeWidth={3} dot={{r: 4}} />
+                  <Line type="monotone" dataKey="acquired" name="获取证书人数" stroke="#10B981" strokeWidth={3} dot={{r: 4}} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
+      </div>
 
+      {/* Section: Cert Sales Data */}
+      <div className="space-y-6">
+        <div className="flex items-center gap-2">
+          <div className="w-1 h-6 bg-green-600 rounded-full"></div>
+          <h3 className="text-xl font-bold text-gray-800">证书销售数据</h3>
+        </div>
         <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <h3 className="text-lg font-bold text-gray-800">证书咨询转化</h3>
+              <h3 className="text-lg font-bold text-gray-800">销售趋势</h3>
               <button 
-                onClick={() => setShowEngagementData(true)}
-                className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all"
+                onClick={() => setShowSalesData(true)}
+                className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
               >
                 <FileText size={14} />
                 查看数据
               </button>
             </div>
-            <TimeRangeSelector range={engagementRange} onChange={setEngagementRange} color="orange" />
+            <TimeRangeSelector range={salesRange} onChange={setSalesRange} color="green" />
           </div>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={c.contentData.engagement[engagementRange === 'week' || engagementRange === 'month' ? 'month' : engagementRange === 'custom' ? 'day' : engagementRange]}>
+              <AreaChart data={c.salesTrend[salesRange === 'week' || salesRange === 'month' ? 'month' : salesRange === 'custom' ? 'day' : salesRange]}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
                 <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
                 <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} unit="%" />
+                <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
                 <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
                 <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
-                <Line yAxisId="left" type="monotone" dataKey="inquiries" name="咨询数" stroke="#F59E0B" strokeWidth={3} dot={{r: 4}} />
-                <Line yAxisId="left" type="monotone" dataKey="sales" name="销售数" stroke="#EF4444" strokeWidth={3} dot={{r: 4}} />
-                <Line yAxisId="right" type="monotone" dataKey="rate" name="咨询转化率" stroke="#8B5CF6" strokeWidth={2} dot={{r: 4}} strokeDasharray="5 5" />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4">
-              <h3 className="text-lg font-bold text-gray-800">证书获取数据</h3>
-              <button 
-                onClick={() => setShowLearningData(true)}
-                className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
-              >
-                <FileText size={14} />
-                查看数据
-              </button>
-            </div>
-            <TimeRangeSelector range={learningRange} onChange={setLearningRange} color="emerald" />
-          </div>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={(c.contentData as any).acquisition[learningRange === 'week' || learningRange === 'month' ? 'month' : learningRange === 'custom' ? 'day' : learningRange]}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
-                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
-                <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
-                <Bar dataKey="joined" name="加入人数" fill="#3B82F6" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="acquired" name="获取证书人数" fill="#10B981" radius={[4, 4, 0, 0]} />
-              </BarChart>
+                <Area yAxisId="left" type="monotone" dataKey="sales" name="销量" stroke="#10B981" fill="#10B981" fillOpacity={0.1} strokeWidth={3} />
+                <Area yAxisId="right" type="monotone" dataKey="revenue" name="销售额" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.1} strokeWidth={3} />
+                <Area yAxisId="left" type="monotone" dataKey="issued" name="颁发量" stroke="#8B5CF6" fill="#8B5CF6" fillOpacity={0.1} strokeWidth={3} />
+              </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
@@ -8224,75 +8458,18 @@ function CertDashboard() {
         </div>
       </div>
 
-      {/* Section: Cert Sales Data */}
-      <div className="space-y-6">
-        <div className="flex items-center gap-2">
-          <div className="w-1 h-6 bg-green-600 rounded-full"></div>
-          <h3 className="text-xl font-bold text-gray-800">证书销售数据</h3>
-        </div>
-        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4">
-              <h3 className="text-lg font-bold text-gray-800">销售趋势</h3>
-              <button 
-                onClick={() => setShowSalesData(true)}
-                className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
-              >
-                <FileText size={14} />
-                查看数据
-              </button>
-            </div>
-            <TimeRangeSelector range={salesRange} onChange={setSalesRange} color="green" />
-          </div>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={c.salesTrend[salesRange === 'week' || salesRange === 'month' ? 'month' : salesRange === 'custom' ? 'day' : salesRange]}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
-                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
-                <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
-                <Area yAxisId="left" type="monotone" dataKey="sales" name="销量" stroke="#10B981" fill="#10B981" fillOpacity={0.1} strokeWidth={3} />
-                <Area yAxisId="right" type="monotone" dataKey="revenue" name="销售额" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.1} strokeWidth={3} />
-                <Area yAxisId="left" type="monotone" dataKey="issued" name="颁发量" stroke="#8B5CF6" fill="#8B5CF6" fillOpacity={0.1} strokeWidth={3} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-gray-50 flex items-center justify-between">
-          <h3 className="text-lg font-bold text-gray-800">证书明细</h3>
-        </div>
-        <table className="w-full text-left text-sm">
-          <thead className="bg-gray-50 text-gray-500 font-medium">
-            <tr>
-              <th className="px-6 py-4">证书ID</th>
-              <th className="px-6 py-4">名称</th>
-              <th className="px-6 py-4">类型</th>
-              <th className="px-6 py-4">咨询数</th>
-              <th className="px-6 py-4">销量</th>
-              <th className="px-6 py-4">颁发数</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-50">
-            {c.certList.map(item => (
-              <tr key={item.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-6 py-4 font-mono text-blue-600">{item.id}</td>
-                <td className="px-6 py-4 text-gray-800 font-medium">{item.name}</td>
-                <td className="px-6 py-4">
-                  <span className="px-2 py-1 bg-purple-50 text-purple-600 rounded-lg text-xs font-bold">{item.type}</span>
-                </td>
-                <td className="px-6 py-4 text-gray-500">{item.inquiries}</td>
-                <td className="px-6 py-4 text-gray-800 font-bold">{item.sales}</td>
-                <td className="px-6 py-4 text-blue-600 font-bold">{item.issued}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <DataViewModal 
+        isOpen={showSalesData}
+        onClose={() => setShowSalesData(false)}
+        title="证书销售与颁发数据"
+        data={c.salesTrend[salesRange === 'week' || salesRange === 'month' ? 'month' : salesRange === 'custom' ? 'day' : salesRange]}
+        columns={[
+          { key: 'date', label: '日期' },
+          { key: 'sales', label: '销量' },
+          { key: 'revenue', label: '销售额', format: (v) => `¥${v.toLocaleString()}` },
+          { key: 'issued', label: '颁发量' }
+        ]}
+      />
 
       <DataViewModal 
         isOpen={showBrowseData}
@@ -8309,13 +8486,13 @@ function CertDashboard() {
       <DataViewModal 
         isOpen={showEngagementData}
         onClose={() => setShowEngagementData(false)}
-        title="证书咨询转化"
+        title="证书咨询转化数据"
         data={c.contentData.engagement[engagementRange === 'week' || engagementRange === 'month' ? 'month' : engagementRange === 'custom' ? 'day' : engagementRange]}
         columns={[
           { key: 'date', label: '日期' },
           { key: 'inquiries', label: '咨询数' },
-          { key: 'sales', label: '销售数' },
-          { key: 'rate', label: '咨询转化率 (%)' }
+          { key: 'sales', label: '订单数' },
+          { key: 'rate', label: '咨询转化率', format: (v) => `${v}%` }
         ]}
       />
 
@@ -8328,20 +8505,7 @@ function CertDashboard() {
           { key: 'date', label: '日期' },
           { key: 'joined', label: '加入人数' },
           { key: 'acquired', label: '获取证书人数' },
-          { key: 'rate', label: '证书获取率 (%)' }
-        ]}
-      />
-
-      <DataViewModal 
-        isOpen={showSalesData}
-        onClose={() => setShowSalesData(false)}
-        title="证书销售与颁发量"
-        data={c.salesTrend[salesRange === 'week' || salesRange === 'month' ? 'month' : salesRange === 'custom' ? 'day' : salesRange]}
-        columns={[
-          { key: 'date', label: '日期' },
-          { key: 'sales', label: '销量' },
-          { key: 'revenue', label: '销售额' },
-          { key: 'issued', label: '颁发量' }
+          { key: 'rate', label: '证书获取率', format: (v) => `${v}%` }
         ]}
       />
     </div>
