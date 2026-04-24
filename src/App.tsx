@@ -114,7 +114,7 @@ function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-const LOGO_URL = "https://gd-hbimg-edge.huaban.com/small/9b88df26e21baf48454721af367212203a8fd57d48215-g5gx5B_fw480webp?auth_key=1773216000-ca1d8b8d906a4f85ba12265d3d2d1186-0-752c92745aee936b4f1e0f1ef6dbbede";
+const LOGO_URL = "https://s1.img-e.com/20260423/69e9c241a684e.png";
 
 function Toast({ message, onClose }: { message: string, onClose: () => void }) {
   useEffect(() => {
@@ -180,14 +180,29 @@ export default function App() {
   const [showLivePopup, setShowLivePopup] = useState(false);
   const [isAdminMode, setIsAdminMode] = useState(true);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [avatarClickCount, setAvatarClickCount] = useState(0);
+  const [isStatsMenuVisible, setIsStatsMenuVisible] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
-  const [activeDashboardModule, setActiveDashboardModule] = useState('overview');
+  const [activeDashboardModule, setActiveDashboardModule] = useState('user');
 
   // Mock current user
   const currentUser: User = {
     name: "王水亮",
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
     role: 'admin'
+  };
+
+  const handleAvatarClick = () => {
+    const newCount = avatarClickCount + 1;
+    setAvatarClickCount(newCount);
+    if (newCount >= 3) {
+      setIsStatsMenuVisible(true);
+      setToast("数据统计菜单已解锁");
+      setAvatarClickCount(0);
+    }
+    // Automatically reset after 2 seconds
+    const timer = setTimeout(() => setAvatarClickCount(0), 4000); // Increased a bit to 4s for user ease
+    return () => clearTimeout(timer);
   };
 
   // Check for upcoming/ongoing lives for popup
@@ -246,8 +261,7 @@ export default function App() {
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => { setView('home'); setIsAdminMode(false); setIsMobileMenuOpen(false); }}>
-            <div className="w-8 h-8 bg-[#7DC16A] rounded-lg flex items-center justify-center text-white font-bold">L</div>
-            <span className="text-xl font-bold text-gray-800 hidden sm:inline">Logo</span>
+            <img src={LOGO_URL} alt="Logo" className="h-8 w-auto object-contain" referrerPolicy="no-referrer" />
           </div>
           {!isAdminMode && (
             <div className="hidden md:flex items-center gap-6 text-[15px] font-medium">
@@ -290,7 +304,7 @@ export default function App() {
         </div>
 
         <div className="relative" onMouseEnter={() => setShowProfileMenu(true)} onMouseLeave={() => setShowProfileMenu(false)}>
-          <div className="flex items-center gap-2 cursor-pointer py-2" onClick={() => setShowProfileMenu(!showProfileMenu)}>
+          <div className="flex items-center gap-2 cursor-pointer py-2" onClick={handleAvatarClick}>
             <img src={currentUser.avatar} alt="Avatar" className="w-8 h-8 rounded-full border border-gray-200" referrerPolicy="no-referrer" />
             <span className="text-sm font-medium hidden sm:inline">{currentUser.name}</span>
           </div>
@@ -424,12 +438,14 @@ export default function App() {
                     >
                       租户直播
                     </div>
-                    <div 
-                      className={cn("px-4 py-3 rounded-xl cursor-pointer transition-all mt-1", view === 'admin-dashboard' && activeDashboardModule === 'overview' ? "bg-[#7DC16A] text-white shadow-lg shadow-[#7DC16A]/20" : "text-gray-600 hover:bg-gray-50")}
-                      onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('overview'); setIsMobileMenuOpen(false); }}
-                    >
-                      数据统计
-                    </div>
+                    {isStatsMenuVisible && (
+                      <div 
+                        className={cn("px-4 py-3 rounded-xl cursor-pointer transition-all mt-1", view === 'admin-dashboard' && activeDashboardModule === 'overview' ? "bg-[#7DC16A] text-white shadow-lg shadow-[#7DC16A]/20" : "text-gray-600 hover:bg-gray-50")}
+                        onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('overview'); setIsMobileMenuOpen(false); }}
+                      >
+                        数据统计
+                      </div>
+                    )}
                     <div 
                       className={cn("px-4 py-3 rounded-xl cursor-pointer transition-all mt-1", view === 'admin-dashboard' && activeDashboardModule === 'user' ? "bg-[#7DC16A] text-white shadow-lg shadow-[#7DC16A]/20" : "text-gray-600 hover:bg-gray-50")}
                       onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('user'); setIsMobileMenuOpen(false); }}
@@ -539,19 +555,10 @@ export default function App() {
                 <Users size={18} />
                 <span className="font-medium">租户直播</span>
               </div>
+              
               <div 
                 className={cn(
                   "flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all",
-                  view === 'admin-dashboard' && activeDashboardModule === 'overview' ? "bg-[#7DC16A] text-white shadow-lg shadow-[#7DC16A]/20" : "text-gray-600 hover:bg-gray-50"
-                )}
-                onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('overview'); }}
-              >
-                <BarChart3 size={18} />
-                <span className="font-medium">数据统计</span>
-              </div>
-              <div 
-                className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all ml-4",
                   view === 'admin-dashboard' && activeDashboardModule === 'user' ? "bg-[#7DC16A] text-white shadow-lg shadow-[#7DC16A]/20" : "text-gray-600 hover:bg-gray-50"
                 )}
                 onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('user'); }}
@@ -561,7 +568,7 @@ export default function App() {
               </div>
               <div 
                 className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all ml-4",
+                  "flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all",
                   view === 'admin-dashboard' && activeDashboardModule === 'course' ? "bg-[#7DC16A] text-white shadow-lg shadow-[#7DC16A]/20" : "text-gray-600 hover:bg-gray-50"
                 )}
                 onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('course'); }}
@@ -571,7 +578,7 @@ export default function App() {
               </div>
               <div 
                 className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all ml-4",
+                  "flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all",
                   view === 'admin-dashboard' && activeDashboardModule === 'class' ? "bg-[#7DC16A] text-white shadow-lg shadow-[#7DC16A]/20" : "text-gray-600 hover:bg-gray-50"
                 )}
                 onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('class'); }}
@@ -581,7 +588,7 @@ export default function App() {
               </div>
               <div 
                 className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all ml-4",
+                  "flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all",
                   view === 'admin-dashboard' && activeDashboardModule === 'cert' ? "bg-[#7DC16A] text-white shadow-lg shadow-[#7DC16A]/20" : "text-gray-600 hover:bg-gray-50"
                 )}
                 onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('cert'); }}
@@ -591,7 +598,7 @@ export default function App() {
               </div>
               <div 
                 className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all ml-4",
+                  "flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all",
                   view === 'admin-dashboard' && activeDashboardModule === 'question' ? "bg-[#7DC16A] text-white shadow-lg shadow-[#7DC16A]/20" : "text-gray-600 hover:bg-gray-50"
                 )}
                 onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('question'); }}
@@ -599,6 +606,19 @@ export default function App() {
                 <HelpCircle size={18} />
                 <span className="font-medium">试题数据</span>
               </div>
+
+              {isStatsMenuVisible && (
+                <div 
+                  className={cn(
+                    "flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all",
+                    view === 'admin-dashboard' && activeDashboardModule === 'overview' ? "bg-[#7DC16A] text-white shadow-lg shadow-[#7DC16A]/20" : "text-gray-600 hover:bg-gray-50"
+                  )}
+                  onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('overview'); }}
+                >
+                  <BarChart3 size={18} />
+                  <span className="font-medium">数据统计</span>
+                </div>
+              )}
               <div 
                 className={cn(
                   "flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all",
@@ -779,8 +799,7 @@ function LoginPage({ onRegister, onLogin }: { onRegister: () => void, onLogin: (
         <div className="hidden md:flex md:w-1/2 bg-[#F8FAFF] p-12 flex-col justify-center items-center relative overflow-hidden">
           <div className="absolute top-8 left-8">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-[#7DC16A] rounded-lg flex items-center justify-center text-white font-bold">L</div>
-              <span className="text-xl font-bold text-gray-800">Logo</span>
+              <img src={LOGO_URL} alt="Logo" className="h-8 w-auto object-contain" referrerPolicy="no-referrer" />
             </div>
           </div>
           <img 
@@ -879,8 +898,7 @@ function RegisterPage({ onLogin, onRegister }: { onLogin: () => void, onRegister
         <div className="hidden md:flex md:w-1/2 bg-[#F8FAFF] p-12 flex-col justify-center items-center relative overflow-hidden">
           <div className="absolute top-8 left-8">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-[#7DC16A] rounded-lg flex items-center justify-center text-white font-bold">L</div>
-              <span className="text-xl font-bold text-gray-800">Logo</span>
+              <img src={LOGO_URL} alt="Logo" className="h-8 w-auto object-contain" referrerPolicy="no-referrer" />
             </div>
           </div>
           <img 
@@ -5995,6 +6013,107 @@ function DataViewModal({
   );
 }
 
+function SalesConversionFunnel({ funnel, fullWidth = false, showRepurchase = true }: { funnel: any, fullWidth?: boolean, showRepurchase?: boolean }) {
+  if (!funnel) return null;
+  return (
+    <div className={cn("space-y-8", fullWidth ? "w-full flex flex-col items-center" : "")}>
+      <div className={cn("flex flex-col items-center", fullWidth ? "w-full max-w-4xl" : "w-full")}>
+        {/* Visual Funnel */}
+        <div className="w-full space-y-2">
+          {/* Browsing */}
+          <div className="group relative">
+            <div className="bg-blue-500/5 border border-blue-500/10 py-3 px-6 rounded-2xl flex items-center justify-between transition-all hover:bg-blue-500/10 hover:border-blue-500/20">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-500 rounded-lg text-white shadow-lg shadow-blue-500/20">
+                  <Eye size={18} />
+                </div>
+                <span className="text-sm font-bold text-blue-600">浏览信息</span>
+              </div>
+              <span className="text-xl font-black text-blue-700">{funnel.browsing.toLocaleString()}</span>
+            </div>
+          </div>
+          {/* Arrow */}
+          <div className="flex justify-center py-2">
+            <div className="p-1 bg-gray-50 rounded-full">
+              <ChevronDown size={16} className="text-gray-300" />
+            </div>
+          </div>
+          {/* Consultation */}
+          <div className={cn("group relative", fullWidth ? "mx-[10%]" : "mx-8")}>
+            <div className="bg-indigo-500/5 border border-indigo-500/10 py-3 px-6 rounded-2xl flex items-center justify-between transition-all hover:bg-indigo-500/10 hover:border-indigo-500/20">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-indigo-500 rounded-lg text-white shadow-lg shadow-indigo-500/20">
+                  <MessageSquare size={18} />
+                </div>
+                <span className="text-sm font-bold text-indigo-600">咨询人数</span>
+              </div>
+              <div className="flex flex-col items-end">
+                <span className="text-xl font-black text-indigo-700">{funnel.consultation.toLocaleString()}</span>
+                <div className="flex items-center gap-1 mt-1">
+                  <TrendingUp size={10} className="text-indigo-400" />
+                  <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">转化率: {((funnel.consultation/funnel.browsing)*100).toFixed(1)}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* Arrow */}
+          <div className="flex justify-center py-2">
+            <div className="p-1 bg-gray-50 rounded-full">
+              <ChevronDown size={16} className="text-gray-300" />
+            </div>
+          </div>
+          {/* Purchase */}
+          <div className={cn("group relative", fullWidth ? "mx-[20%]" : "mx-16")}>
+            <div className="bg-[#7DC16A]/5 border border-[#7DC16A]/10 py-3 px-6 rounded-2xl flex items-center justify-between transition-all hover:bg-[#7DC16A]/10 hover:border-[#7DC16A]/20">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-[#7DC16A] rounded-lg text-white shadow-lg shadow-[#7DC16A]/20">
+                  <BarChart3 size={18} />
+                </div>
+                <span className="text-sm font-bold text-[#7DC16A]">购买人数</span>
+              </div>
+              <div className="flex flex-col items-end">
+                <span className="text-xl font-black text-[#7DC16A]">{funnel.purchase.toLocaleString()}</span>
+                <div className="flex items-center gap-1 mt-1">
+                  <TrendingUp size={10} className="text-[#7DC16A]/50" />
+                  <span className="text-[10px] font-bold text-[#7DC16A]/60 uppercase tracking-widest">转化率: {((funnel.purchase/funnel.consultation)*100).toFixed(1)}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          {showRepurchase && (
+            <>
+              {/* Arrow */}
+              <div className="flex justify-center py-2">
+                <div className="p-1 bg-gray-50 rounded-full">
+                  <ChevronDown size={16} className="text-gray-300" />
+                </div>
+              </div>
+              {/* Repurchase */}
+              <div className={cn("group relative", fullWidth ? "mx-[30%]" : "mx-24")}>
+                <div className="bg-orange-500/5 border border-orange-500/10 py-3 px-6 rounded-2xl flex items-center justify-between transition-all hover:bg-orange-500/10 hover:border-orange-500/20">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-orange-500 rounded-lg text-white shadow-lg shadow-orange-500/20">
+                      <RotateCcw size={18} />
+                    </div>
+                    <span className="text-sm font-bold text-orange-600">复购人数</span>
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <span className="text-xl font-black text-orange-700">{funnel.repurchase.toLocaleString()}</span>
+                    <div className="flex items-center gap-1 mt-1">
+                      <TrendingUp size={10} className="text-orange-400" />
+                      <span className="text-[10px] font-bold text-orange-400 uppercase tracking-widest">复购率: {((funnel.repurchase/funnel.purchase)*100).toFixed(1)}%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AdminDashboardPage({ 
   activeModule
 }: { 
@@ -6051,19 +6170,19 @@ function DashboardOverview() {
   const rangeLabel = globalRange === 'day' ? '本日' : globalRange === 'week' ? '本周' : '本月';
 
   const stats = [
-    { label: '累计注册', value: MOCK_DASHBOARD_OVERVIEW.totalRegistered.toLocaleString(), icon: <Users className="text-blue-500" /> },
-    { label: `${rangeLabel}注册量`, value: MOCK_DASHBOARD_OVERVIEW.monthlyRegistered.toLocaleString(), icon: <UserPlus className="text-cyan-500" /> },
-    { label: `${rangeLabel}活跃`, value: MOCK_DASHBOARD_OVERVIEW.monthlyActive.toLocaleString(), icon: <Activity className="text-green-500" /> },
-    { label: '累计销售额', value: `¥${MOCK_DASHBOARD_OVERVIEW.totalSales.toLocaleString()}`, icon: <TrendingUp className="text-red-500" /> },
-    { label: '累计销售量', value: MOCK_DASHBOARD_OVERVIEW.totalSalesVolume.toLocaleString(), icon: <FileText className="text-blue-600" /> },
-    { label: `${rangeLabel}销售额`, value: `¥${MOCK_DASHBOARD_OVERVIEW.monthlySalesRevenue.toLocaleString()}`, icon: <CheckCircle2 className="text-purple-500" /> },
-    { label: `${rangeLabel}销售量`, value: MOCK_DASHBOARD_OVERVIEW.monthlySalesVolume.toLocaleString(), icon: <FileText className="text-orange-500" /> },
+    { label: '累计注册', value: (MOCK_DASHBOARD_OVERVIEW.totalRegistered || 0).toLocaleString(), icon: <Users className="text-blue-500" /> },
+    { label: `${rangeLabel}注册量`, value: (MOCK_DASHBOARD_OVERVIEW.monthlyRegistered || 0).toLocaleString(), icon: <UserPlus className="text-cyan-500" /> },
+    { label: `${rangeLabel}活跃`, value: (MOCK_DASHBOARD_OVERVIEW.monthlyActive || 0).toLocaleString(), icon: <Activity className="text-green-500" /> },
+    { label: '累计销售额', value: `¥${(MOCK_DASHBOARD_OVERVIEW.totalSales || 0).toLocaleString()}`, icon: <TrendingUp className="text-red-500" /> },
+    { label: '累计销售量', value: (MOCK_DASHBOARD_OVERVIEW.totalSalesVolume || 0).toLocaleString(), icon: <FileText className="text-blue-600" /> },
+    { label: `${rangeLabel}销售额`, value: `¥${(MOCK_DASHBOARD_OVERVIEW.monthlySalesRevenue || 0).toLocaleString()}`, icon: <CheckCircle2 className="text-purple-500" /> },
+    { label: `${rangeLabel}销售量`, value: (MOCK_DASHBOARD_OVERVIEW.monthlySalesVolume || 0).toLocaleString(), icon: <FileText className="text-orange-500" /> },
   ];
 
   const getSortValue = (item: any, sort: string) => {
-    const val = item[sort];
-    if (sort === 'revenue') return `¥${val.toLocaleString()}`;
-    return val.toLocaleString();
+    const val = item[sort] || 0;
+    if (sort === 'revenue') return `¥${Number(val).toLocaleString()}`;
+    return Number(val).toLocaleString();
   };
 
   return (
@@ -6302,72 +6421,7 @@ function DashboardOverview() {
       <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
         <h3 className="text-lg font-bold text-gray-800 mb-8">销售转化漏斗</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
-          {(MOCK_DASHBOARD_OVERVIEW as any).funnels.map((f: any, idx: number) => (
-            <div key={idx} className="space-y-6">
-              <div className="text-center">
-                <span className="text-sm font-bold text-gray-400 bg-gray-50 px-4 py-1 rounded-full">{f.title}</span>
-              </div>
-              <div className="flex flex-col items-center">
-                {/* Visual Funnel */}
-                <div className="w-full space-y-1">
-                  {/* Browsing */}
-                  <div className="group relative">
-                    <div className="bg-blue-500/10 border border-blue-500/20 py-3 px-4 rounded-xl flex items-center justify-between transition-all hover:bg-blue-500/15">
-                      <span className="text-xs font-bold text-blue-600">浏览信息</span>
-                      <span className="text-sm font-bold text-blue-700">{f.browsing.toLocaleString()}</span>
-                    </div>
-                  </div>
-                  {/* Arrow */}
-                  <div className="flex justify-center py-1">
-                    <ChevronDown size={14} className="text-gray-300" />
-                  </div>
-                  {/* Consultation */}
-                  <div className="group relative mx-4">
-                    <div className="bg-indigo-500/10 border border-indigo-500/20 py-3 px-4 rounded-xl flex items-center justify-between transition-all hover:bg-indigo-500/15">
-                      <span className="text-xs font-bold text-indigo-600">咨询人数</span>
-                      <div className="flex flex-col items-end">
-                        <span className="text-sm font-bold text-indigo-700">{f.consultation.toLocaleString()}</span>
-                        <span className="text-[10px] text-indigo-400">转化率: {((f.consultation/f.browsing)*100).toFixed(1)}%</span>
-                      </div>
-                    </div>
-                  </div>
-                  {/* Arrow */}
-                  <div className="flex justify-center py-1">
-                    <ChevronDown size={14} className="text-gray-300" />
-                  </div>
-                  {/* Purchase */}
-                  <div className="group relative mx-8">
-                    <div className="bg-[#7DC16A]/10 border border-[#7DC16A]/20 py-3 px-4 rounded-xl flex items-center justify-between transition-all hover:bg-[#7DC16A]/15">
-                      <span className="text-xs font-bold text-[#7DC16A]">购买人数</span>
-                      <div className="flex flex-col items-end">
-                        <span className="text-sm font-bold text-[#7DC16A]">{f.purchase.toLocaleString()}</span>
-                        <span className="text-[10px] text-[#7DC16A]/60">转化率: {((f.purchase/f.consultation)*100).toFixed(1)}%</span>
-                      </div>
-                    </div>
-                  </div>
-                  {/* Arrow */}
-                  <div className="flex justify-center py-1">
-                    <ChevronDown size={14} className="text-gray-300" />
-                  </div>
-                  {/* Repurchase */}
-                  <div className="group relative mx-12">
-                    <div className="bg-orange-500/10 border border-orange-500/20 py-3 px-4 rounded-xl flex items-center justify-between transition-all hover:bg-orange-500/15">
-                      <span className="text-xs font-bold text-orange-600">复购人数</span>
-                      <div className="flex flex-col items-end">
-                        <span className="text-sm font-bold text-orange-700">{f.repurchase.toLocaleString()}</span>
-                        <span className="text-[10px] text-orange-400">复购率: {((f.repurchase/f.purchase)*100).toFixed(1)}%</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                {/* Overall Rate */}
-                <div className="mt-4 pt-4 border-t border-gray-50 w-full text-center">
-                   <p className="text-xs text-gray-400">总转化率: <span className="text-[#7DC16A] font-bold">{((f.purchase/f.browsing)*100).toFixed(1)}%</span></p>
-                   {f.repurchase && <p className="text-[10px] text-gray-300 mt-1">复购贡献率: {((f.repurchase/f.browsing)*100).toFixed(2)}%</p>}
-                </div>
-              </div>
-            </div>
-          ))}
+           <SalesConversionFunnel funnel={(MOCK_DASHBOARD_OVERVIEW as any).funnels[0]} />
         </div>
       </div>
 
@@ -7197,9 +7251,10 @@ function CourseDashboard() {
   const [engagementRange, setEngagementRange] = useState<'day' | 'week' | 'month' | 'custom'>('day');
   const [learningRange, setLearningRange] = useState<'day' | 'week' | 'month' | 'custom'>('day');
   const [salesRange, setSalesRange] = useState<'day' | 'week' | 'month' | 'custom'>('day');
+  const [funnelRange, setFunnelRange] = useState<'day' | 'week' | 'month' | 'total'>('total');
   const [rankingType, setRankingType] = useState<'domain' | 'position' | 'certification'>('domain');
   const [rankingRange, setRankingRange] = useState<'week' | 'month' | 'total'>('total');
-  const [rankingSort, setRankingSort] = useState<'count' | 'pv' | 'uv' | 'inquiries' | 'sales' | 'revenue'>('count');
+  const [rankingSort, setRankingSort] = useState<'count' | 'pv' | 'uv' | 'inquiries' | 'sales' | 'revenue'>('revenue');
   const [showBrowseData, setShowBrowseData] = useState(false);
   const [showEngagementData, setShowEngagementData] = useState(false);
   const [showLearningData, setShowLearningData] = useState(false);
@@ -7239,21 +7294,21 @@ function CourseDashboard() {
   const rangeLabel = globalRange === 'day' ? '本日' : globalRange === 'week' ? '本周' : '本月';
 
   const stats = statMode === 'accumulated' ? [
-    { label: '累计上架', value: c.totalPublished.toLocaleString(), icon: <BookOpen className="text-blue-500" /> },
-    { label: '累计销售量', value: c.totalSalesVolume.toLocaleString(), icon: <TrendingUp className="text-green-500" /> },
-    { label: '累计销售额', value: `¥${c.conversion.revenue.toLocaleString()}`, icon: <BarChart3 className="text-purple-500" /> },
+    { label: '累计上架', value: (c.totalPublished || 0).toLocaleString(), icon: <BookOpen className="text-blue-500" /> },
+    { label: '累计销售量', value: (c.totalSalesVolume || 0).toLocaleString(), icon: <TrendingUp className="text-green-500" /> },
+    { label: '累计销售额', value: `¥${(c.conversion?.revenue || 0).toLocaleString()}`, icon: <BarChart3 className="text-purple-500" /> },
     { label: '累计课程学习人数', value: (c.studentCount || 0).toLocaleString(), icon: <Users className="text-indigo-500" /> },
-    { label: '累计课时', value: `${c.totalHours.toLocaleString()}h`, icon: <Clock className="text-orange-500" /> },
-    { label: '累计人均课时', value: `${c.avgHours}h`, icon: <UserIcon className="text-blue-400" /> },
-    { label: '累计完课率', value: `${c.completionRate}%`, icon: <CheckCircle2 className="text-emerald-500" /> },
+    { label: '累计课时', value: `${(c.totalHours || 0).toLocaleString()}h`, icon: <Clock className="text-orange-500" /> },
+    { label: '累计人均课时', value: `${c.avgHours || 0}h`, icon: <UserIcon className="text-blue-400" /> },
+    { label: '累计完课率', value: `${c.completionRate || 0}%`, icon: <CheckCircle2 className="text-emerald-500" /> },
   ] : [
-    { label: `${rangeLabel}上架`, value: c.weeklyNew.toLocaleString(), icon: <Plus className="text-cyan-500" /> },
+    { label: `${rangeLabel}上架`, value: (c.weeklyNew || 0).toLocaleString(), icon: <Plus className="text-cyan-500" /> },
     { label: `${rangeLabel}销售量`, value: (c.periodSales || 0).toLocaleString(), icon: <TrendingUp className="text-emerald-500" /> },
     { label: `${rangeLabel}销售额`, value: `¥${(c.periodRevenue || 0).toLocaleString()}`, icon: <BarChart3 className="text-blue-600" /> },
-    { label: `${rangeLabel}课程学习人数`, value: Math.floor(c.studentCount * 0.15).toLocaleString(), icon: <Users className="text-indigo-400" /> },
-    { label: `${rangeLabel}课时`, value: `${Math.floor(c.totalHours * 1.5).toLocaleString()}h`, icon: <Clock className="text-orange-400" /> },
-    { label: `${rangeLabel}人均课时`, value: `${(c.avgHours * 1.2).toFixed(1)}h`, icon: <UserIcon className="text-blue-300" /> },
-    { label: `${rangeLabel}完课率`, value: `${(c.completionRate * 1.1).toFixed(1)}%`, icon: <CheckCircle2 className="text-emerald-400" /> },
+    { label: `${rangeLabel}课程学习人数`, value: Math.floor((c.studentCount || 0) * 0.15).toLocaleString(), icon: <Users className="text-indigo-400" /> },
+    { label: `${rangeLabel}课时`, value: `${Math.floor((c.totalHours || 0) * 1.5).toLocaleString()}h`, icon: <Clock className="text-orange-400" /> },
+    { label: `${rangeLabel}人均课时`, value: `${((c.avgHours || 0) * 1.2).toFixed(1)}h`, icon: <UserIcon className="text-blue-300" /> },
+    { label: `${rangeLabel}完课率`, value: `${((c.completionRate || 0) * 1.1).toFixed(1)}%`, icon: <CheckCircle2 className="text-emerald-400" /> },
   ];
 
   return (
@@ -7407,7 +7462,7 @@ function CourseDashboard() {
           <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-4">
-                <h3 className="text-lg font-bold text-gray-800">课程咨询转化</h3>
+                <h3 className="text-lg font-bold text-gray-800">意向数据</h3>
                 <button 
                   onClick={() => setShowEngagementData(true)}
                   className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all"
@@ -7424,12 +7479,10 @@ function CourseDashboard() {
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
                   <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
                   <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                  <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} unit="%" />
                   <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
                   <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
                   <Line yAxisId="left" type="monotone" dataKey="inquiries" name="咨询数" stroke="#F59E0B" strokeWidth={3} dot={{r: 4}} />
-                  <Line yAxisId="left" type="monotone" dataKey="sales" name="销售数" stroke="#EF4444" strokeWidth={3} dot={{r: 4}} />
-                  <Line yAxisId="right" type="monotone" dataKey="rate" name="咨询转化率" stroke="#8B5CF6" strokeWidth={2} dot={{r: 4}} strokeDasharray="5 5" />
+                  <Line yAxisId="left" type="monotone" dataKey="sales" name="收藏数" stroke="#EF4444" strokeWidth={3} dot={{r: 4}} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -7466,39 +7519,75 @@ function CourseDashboard() {
         </div>
       </div>
 
-      {/* Section: Course Sales Data */}
+      {/* Section: Course Sales Data and Funnel */}
       <div className="space-y-6">
         <div className="flex items-center gap-2">
           <div className="w-1 h-6 bg-green-600 rounded-full"></div>
-          <h3 className="text-xl font-bold text-gray-800">课程销售数据</h3>
+          <h3 className="text-xl font-bold text-gray-800">课程销售数据中心</h3>
         </div>
-        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4">
-              <h3 className="text-lg font-bold text-gray-800">销售趋势</h3>
-              <button 
-                onClick={() => setShowSalesData(true)}
-                className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
-              >
-                <FileText size={14} />
-                查看数据
-              </button>
+        
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+          {/* Sales Trend */}
+          <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm h-full">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-4">
+                <h3 className="text-lg font-bold text-gray-800">销售趋势</h3>
+                <button 
+                  onClick={() => setShowSalesData(true)}
+                  className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
+                >
+                  <FileText size={14} />
+                  查看数据
+                </button>
+              </div>
+              <TimeRangeSelector range={salesRange} onChange={setSalesRange} color="green" />
             </div>
-            <TimeRangeSelector range={salesRange} onChange={setSalesRange} color="green" />
+            <div className="h-[350px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={c.salesTrend[salesRange === 'week' || salesRange === 'month' ? 'month' : salesRange === 'custom' ? 'day' : salesRange]}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
+                  <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                  <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                  <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                  <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
+                  <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
+                  <Area yAxisId="left" type="monotone" dataKey="sales" name="销量" stroke="#10B981" fill="#10B981" fillOpacity={0.1} strokeWidth={3} />
+                  <Area yAxisId="right" type="monotone" dataKey="revenue" name="销售额" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.1} strokeWidth={3} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={c.salesTrend[salesRange === 'week' || salesRange === 'month' ? 'month' : salesRange === 'custom' ? 'day' : salesRange]}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
-                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
-                <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
-                <Area yAxisId="left" type="monotone" dataKey="sales" name="销量" stroke="#10B981" fill="#10B981" fillOpacity={0.1} strokeWidth={3} />
-                <Area yAxisId="right" type="monotone" dataKey="revenue" name="销售额" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.1} strokeWidth={3} />
-              </AreaChart>
-            </ResponsiveContainer>
+
+          {/* Sales Conversion Funnel */}
+          <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm h-full flex flex-col">
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="text-lg font-bold text-gray-800">客户层销售转化漏斗</h3>
+              <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
+                {[
+                  { id: 'day', label: '日' },
+                  { id: 'week', label: '周' },
+                  { id: 'month', label: '月' },
+                  { id: 'total', label: '累计' }
+                ].map(r => (
+                  <button 
+                    key={r.id}
+                    onClick={() => setFunnelRange(r.id as any)}
+                    className={cn(
+                      "px-3 py-1 text-[10px] font-bold rounded-lg transition-all",
+                      funnelRange === r.id ? "bg-white text-green-600 shadow-sm" : "text-gray-400 hover:text-gray-600"
+                    )}
+                  >
+                    {r.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="h-[350px] flex flex-col justify-center overflow-auto no-scrollbar py-4">
+              <SalesConversionFunnel 
+                funnel={(MOCK_DASHBOARD_OVERVIEW as any).funnels[1]} 
+                showRepurchase={funnelRange === 'total'} 
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -7577,7 +7666,7 @@ function CourseDashboard() {
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-sm font-medium text-gray-700">{item.name}</span>
                     <span className="text-sm font-bold text-gray-900">
-                      {rankingSort === 'revenue' ? `¥${item.revenue.toLocaleString()}` : item[rankingSort].toLocaleString()}
+                      {rankingSort === 'revenue' ? `¥${(item.revenue || 0).toLocaleString()}` : (item[rankingSort] || 0).toLocaleString()}
                     </span>
                   </div>
                   <div className="w-full h-2 bg-gray-50 rounded-full overflow-hidden">
@@ -7621,13 +7710,12 @@ function CourseDashboard() {
       <DataViewModal 
         isOpen={showEngagementData}
         onClose={() => setShowEngagementData(false)}
-        title="课程咨询转化数据"
+        title="意向数据详情"
         data={c.contentData.engagement[engagementRange === 'week' || engagementRange === 'month' ? 'month' : engagementRange === 'custom' ? 'day' : engagementRange]}
         columns={[
           { key: 'date', label: '日期' },
           { key: 'inquiries', label: '咨询数' },
-          { key: 'sales', label: '订单数' },
-          { key: 'rate', label: '咨询转化率', format: (v) => `${v}%` }
+          { key: 'sales', label: '收藏数' }
         ]}
       />
 
@@ -7661,6 +7749,7 @@ function ClassDashboard() {
   const [engagementRange, setEngagementRange] = useState<'day' | 'week' | 'month' | 'custom'>('day');
   const [learningRange, setLearningRange] = useState<'day' | 'week' | 'month' | 'custom'>('day');
   const [salesRange, setSalesRange] = useState<'day' | 'week' | 'month' | 'custom'>('day');
+  const [funnelRange, setFunnelRange] = useState<'day' | 'week' | 'month' | 'total'>('total');
   const [rankingType, setRankingType] = useState<'domain' | 'position' | 'certification'>('domain');
   const [rankingRange, setRankingRange] = useState<'week' | 'month' | 'total'>('total');
   const [rankingSort, setRankingSort] = useState<'count' | 'pv' | 'uv' | 'inquiries' | 'sales' | 'revenue'>('count');
@@ -7689,17 +7778,17 @@ function ClassDashboard() {
   const rangeLabel = globalRange === 'day' ? '本日' : globalRange === 'week' ? '本周' : '本月';
 
   const stats = statMode === 'accumulated' ? [
-    { label: '累计上架', value: `${c.totalPublished.toLocaleString()} (付费${Math.floor(c.totalPublished*0.6)} / 免费${Math.floor(c.totalPublished*0.4)})`, icon: <BookOpen className="text-blue-500" /> },
-    { label: '累计销售量', value: c.totalSalesVolume.toLocaleString(), icon: <TrendingUp className="text-green-500" /> },
-    { label: '累计销售额', value: `¥${c.conversion.revenue.toLocaleString()}`, icon: <BarChart3 className="text-purple-500" /> },
+    { label: '累计上架', value: (c.totalPublished || 0).toLocaleString(), icon: <BookOpen className="text-blue-500" /> },
+    { label: '累计销售量', value: (c.totalSalesVolume || 0).toLocaleString(), icon: <TrendingUp className="text-green-500" /> },
+    { label: '累计销售额', value: `¥${(c.conversion?.revenue || 0).toLocaleString()}`, icon: <BarChart3 className="text-purple-500" /> },
     { label: '累计班级学习人数', value: (c.studentCount || 0).toLocaleString(), icon: <Users className="text-indigo-500" /> },
     { label: '累计班级毕业人数', value: `${(c as any).graduatedCount || 0}人`, icon: <CheckCircle2 className="text-emerald-500" /> },
     { label: '累计通过率', value: `${(c as any).passRate || 0}%`, icon: <Award className="text-orange-500" /> },
   ] : [
-    { label: `${rangeLabel}上架`, value: `${c.weeklyNew.toLocaleString()} (付费${Math.floor(c.weeklyNew*0.7)} / 免费${Math.floor(c.weeklyNew*0.3)})`, icon: <Plus className="text-cyan-500" /> },
+    { label: `${rangeLabel}上架`, value: (c.weeklyNew || 0).toLocaleString(), icon: <Plus className="text-cyan-500" /> },
     { label: `${rangeLabel}销售量`, value: (c.periodSales || 0).toLocaleString(), icon: <TrendingUp className="text-emerald-500" /> },
     { label: `${rangeLabel}销售额`, value: `¥${(c.periodRevenue || 0).toLocaleString()}`, icon: <BarChart3 className="text-blue-600" /> },
-    { label: `${rangeLabel}班级学习人数`, value: Math.floor(c.studentCount * 0.12).toLocaleString(), icon: <Users className="text-indigo-400" /> },
+    { label: `${rangeLabel}班级学习人数`, value: Math.floor((c.studentCount || 0) * 0.12).toLocaleString(), icon: <Users className="text-indigo-400" /> },
     { label: `${rangeLabel}班级毕业人数`, value: `${Math.floor(((c as any).graduatedCount || 0) * 0.1)}人`, icon: <CheckCircle2 className="text-emerald-400" /> },
     { label: `${rangeLabel}通过率`, value: `${((c as any).passRate || 0) + 1.5}%`, icon: <Award className="text-orange-400" /> },
   ];
@@ -7854,7 +7943,7 @@ function ClassDashboard() {
           <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-4">
-                <h3 className="text-lg font-bold text-gray-800">班级咨询转化</h3>
+                <h3 className="text-lg font-bold text-gray-800">意向数据</h3>
                 <button 
                   onClick={() => setShowEngagementData(true)}
                   className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all"
@@ -7871,12 +7960,10 @@ function ClassDashboard() {
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
                   <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
                   <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                  <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} unit="%" />
                   <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
                   <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
                   <Line yAxisId="left" type="monotone" dataKey="inquiries" name="咨询数" stroke="#F59E0B" strokeWidth={3} dot={{r: 4}} />
-                  <Line yAxisId="left" type="monotone" dataKey="sales" name="销售数" stroke="#EF4444" strokeWidth={3} dot={{r: 4}} />
-                  <Line yAxisId="right" type="monotone" dataKey="rate" name="咨询转化率" stroke="#8B5CF6" strokeWidth={2} dot={{r: 4}} strokeDasharray="5 5" />
+                  <Line yAxisId="left" type="monotone" dataKey="sales" name="收藏数" stroke="#EF4444" strokeWidth={3} dot={{r: 4}} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -7913,39 +8000,75 @@ function ClassDashboard() {
         </div>
       </div>
 
-      {/* Section: Class Sales Data */}
+      {/* Section: Class Sales Data and Funnel */}
       <div className="space-y-6">
         <div className="flex items-center gap-2">
           <div className="w-1 h-6 bg-green-600 rounded-full"></div>
-          <h3 className="text-xl font-bold text-gray-800">班级销售数据</h3>
+          <h3 className="text-xl font-bold text-gray-800">班级销售数据中心</h3>
         </div>
-        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4">
-              <h3 className="text-lg font-bold text-gray-800">销售趋势</h3>
-              <button 
-                onClick={() => setShowSalesData(true)}
-                className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
-              >
-                <FileText size={14} />
-                查看数据
-              </button>
+        
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+          {/* Sales Trend */}
+          <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm h-full">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-4">
+                <h3 className="text-lg font-bold text-gray-800">销售趋势</h3>
+                <button 
+                  onClick={() => setShowSalesData(true)}
+                  className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
+                >
+                  <FileText size={14} />
+                  查看数据
+                </button>
+              </div>
+              <TimeRangeSelector range={salesRange} onChange={setSalesRange} color="green" />
             </div>
-            <TimeRangeSelector range={salesRange} onChange={setSalesRange} color="green" />
+            <div className="h-[350px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={c.salesTrend[salesRange === 'week' || salesRange === 'month' ? 'month' : salesRange === 'custom' ? 'day' : salesRange]}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
+                  <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                  <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                  <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                  <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
+                  <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
+                  <Area yAxisId="left" type="monotone" dataKey="sales" name="销量" stroke="#10B981" fill="#10B981" fillOpacity={0.1} strokeWidth={3} />
+                  <Area yAxisId="right" type="monotone" dataKey="revenue" name="销售额" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.1} strokeWidth={3} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={c.salesTrend[salesRange === 'week' || salesRange === 'month' ? 'month' : salesRange === 'custom' ? 'day' : salesRange]}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
-                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
-                <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
-                <Area yAxisId="left" type="monotone" dataKey="sales" name="销量" stroke="#10B981" fill="#10B981" fillOpacity={0.1} strokeWidth={3} />
-                <Area yAxisId="right" type="monotone" dataKey="revenue" name="销售额" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.1} strokeWidth={3} />
-              </AreaChart>
-            </ResponsiveContainer>
+
+          {/* Sales Conversion Funnel */}
+          <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm h-full flex flex-col">
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="text-lg font-bold text-gray-800">客户层销售转化漏斗</h3>
+              <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
+                {[
+                  { id: 'day', label: '日' },
+                  { id: 'week', label: '周' },
+                  { id: 'month', label: '月' },
+                  { id: 'total', label: '累计' }
+                ].map(r => (
+                  <button 
+                    key={r.id}
+                    onClick={() => setFunnelRange(r.id as any)}
+                    className={cn(
+                      "px-3 py-1 text-[10px] font-bold rounded-lg transition-all",
+                      funnelRange === r.id ? "bg-white text-green-600 shadow-sm" : "text-gray-400 hover:text-gray-600"
+                    )}
+                  >
+                    {r.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="h-[350px] flex flex-col justify-center overflow-auto no-scrollbar py-4">
+              <SalesConversionFunnel 
+                funnel={(MOCK_DASHBOARD_OVERVIEW as any).funnels[3]} 
+                showRepurchase={funnelRange === 'total'} 
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -8024,7 +8147,7 @@ function ClassDashboard() {
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-sm font-medium text-gray-700">{item.name}</span>
                     <span className="text-sm font-bold text-gray-900">
-                      {rankingSort === 'revenue' ? `¥${item.revenue.toLocaleString()}` : item[rankingSort].toLocaleString()}
+                      {rankingSort === 'revenue' ? `¥${(item.revenue || 0).toLocaleString()}` : (item[rankingSort] || 0).toLocaleString()}
                     </span>
                   </div>
                   <div className="w-full h-2 bg-gray-50 rounded-full overflow-hidden">
@@ -8068,13 +8191,12 @@ function ClassDashboard() {
       <DataViewModal 
         isOpen={showEngagementData}
         onClose={() => setShowEngagementData(false)}
-        title="班级咨询转化数据"
+        title="意向数据详情"
         data={c.contentData.engagement[engagementRange === 'week' || engagementRange === 'month' ? 'month' : engagementRange === 'custom' ? 'day' : engagementRange]}
         columns={[
           { key: 'date', label: '日期' },
           { key: 'inquiries', label: '咨询数' },
-          { key: 'sales', label: '订单数' },
-          { key: 'rate', label: '咨询转化率', format: (v) => `${v}%` }
+          { key: 'sales', label: '收藏数' }
         ]}
       />
 
@@ -8108,6 +8230,7 @@ function CertDashboard() {
   const [engagementRange, setEngagementRange] = useState<'day' | 'week' | 'month' | 'custom'>('day');
   const [learningRange, setLearningRange] = useState<'day' | 'week' | 'month' | 'custom'>('day');
   const [salesRange, setSalesRange] = useState<'day' | 'week' | 'month' | 'custom'>('day');
+  const [funnelRange, setFunnelRange] = useState<'day' | 'week' | 'month' | 'total'>('total');
   const [rankingRange, setRankingRange] = useState<'week' | 'month' | 'total'>('total');
   const [rankingSort, setRankingSort] = useState<'count' | 'pv' | 'uv' | 'inquiries' | 'sales' | 'revenue'>('count');
   const [showBrowseData, setShowBrowseData] = useState(false);
@@ -8147,18 +8270,18 @@ function CertDashboard() {
   const rangeLabel = globalRange === 'day' ? '本日' : globalRange === 'week' ? '本周' : '本月';
 
   const stats = statMode === 'accumulated' ? [
-    { label: '累计颁发', value: c.totalIssued.toLocaleString(), icon: <FileCheck className="text-blue-500" /> },
-    { label: '累计上架', value: c.totalPublished.toLocaleString(), icon: <BookOpen className="text-emerald-500" /> },
-    { label: '累计销售量', value: c.totalSalesVolume.toLocaleString(), icon: <TrendingUp className="text-blue-600" /> },
-    { label: '累计销售额', value: `¥${c.conversion.revenue.toLocaleString()}`, icon: <BarChart3 className="text-purple-500" /> },
-    { label: '累计学习人数', value: (c as any).studentCount.toLocaleString(), icon: <Users className="text-indigo-500" /> },
+    { label: '累计颁发', value: (c.totalIssued || 0).toLocaleString(), icon: <FileCheck className="text-blue-500" /> },
+    { label: '累计上架', value: (c.totalPublished || 0).toLocaleString(), icon: <BookOpen className="text-emerald-500" /> },
+    { label: '累计销售量', value: (c.totalSalesVolume || 0).toLocaleString(), icon: <TrendingUp className="text-blue-600" /> },
+    { label: '累计销售额', value: `¥${(c.conversion?.revenue || 0).toLocaleString()}`, icon: <BarChart3 className="text-purple-500" /> },
+    { label: '累计学习人数', value: (c.studentCount || 0).toLocaleString(), icon: <Users className="text-indigo-500" /> },
     { label: '累计获取率', value: `${((c as any).acquisitionRate || 0).toFixed(2)}%`, icon: <CheckCircle2 className="text-emerald-600" /> },
   ] : [
-    { label: `${rangeLabel}颁发`, value: Math.floor(c.totalIssued * 0.1).toLocaleString(), icon: <FileCheck className="text-blue-400" /> },
-    { label: `${rangeLabel}上架`, value: c.weeklyNew.toLocaleString(), icon: <Plus className="text-cyan-500" /> },
-    { label: `${rangeLabel}销售量`, value: c.periodSales.toLocaleString(), icon: <TrendingUp className="text-emerald-500" /> },
-    { label: `${rangeLabel}销售额`, value: `¥${c.periodRevenue.toLocaleString()}`, icon: <BarChart3 className="text-blue-600" /> },
-    { label: `${rangeLabel}学习人数`, value: Math.floor((c as any).studentCount * 0.15).toLocaleString(), icon: <Users className="text-indigo-400" /> },
+    { label: `${rangeLabel}颁发`, value: Math.floor((c.totalIssued || 0) * 0.1).toLocaleString(), icon: <FileCheck className="text-blue-400" /> },
+    { label: `${rangeLabel}上架`, value: (c.weeklyNew || 0).toLocaleString(), icon: <Plus className="text-cyan-500" /> },
+    { label: `${rangeLabel}销售量`, value: (c.periodSales || 0).toLocaleString(), icon: <TrendingUp className="text-emerald-500" /> },
+    { label: `${rangeLabel}销售额`, value: `¥${(c.periodRevenue || 0).toLocaleString()}`, icon: <BarChart3 className="text-blue-600" /> },
+    { label: `${rangeLabel}学习人数`, value: Math.floor((c.studentCount || 0) * 0.15).toLocaleString(), icon: <Users className="text-indigo-400" /> },
     { label: `${rangeLabel}获取率`, value: `${(((c as any).acquisitionRate || 0) + 1.2).toFixed(2)}%`, icon: <CheckCircle2 className="text-emerald-400" /> },
   ];
 
@@ -8291,7 +8414,7 @@ function CertDashboard() {
           <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-4">
-                <h3 className="text-lg font-bold text-gray-800">证书咨询转化</h3>
+                <h3 className="text-lg font-bold text-gray-800">意向数据</h3>
                 <button 
                   onClick={() => setShowEngagementData(true)}
                   className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all"
@@ -8308,12 +8431,10 @@ function CertDashboard() {
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
                   <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
                   <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                  <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} unit="%" />
                   <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
                   <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
                   <Line yAxisId="left" type="monotone" dataKey="inquiries" name="咨询数" stroke="#F59E0B" strokeWidth={3} dot={{r: 4}} />
-                  <Line yAxisId="left" type="monotone" dataKey="sales" name="销售数" stroke="#EF4444" strokeWidth={3} dot={{r: 4}} />
-                  <Line yAxisId="right" type="monotone" dataKey="rate" name="咨询转化率" stroke="#8B5CF6" strokeWidth={2} dot={{r: 4}} strokeDasharray="5 5" />
+                  <Line yAxisId="left" type="monotone" dataKey="sales" name="收藏数" stroke="#EF4444" strokeWidth={3} dot={{r: 4}} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -8350,40 +8471,76 @@ function CertDashboard() {
         </div>
       </div>
 
-      {/* Section: Cert Sales Data */}
+      {/* Section: Cert Sales Data and Funnel */}
       <div className="space-y-6">
         <div className="flex items-center gap-2">
           <div className="w-1 h-6 bg-green-600 rounded-full"></div>
-          <h3 className="text-xl font-bold text-gray-800">证书销售数据</h3>
+          <h3 className="text-xl font-bold text-gray-800">证书销售数据中心</h3>
         </div>
-        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4">
-              <h3 className="text-lg font-bold text-gray-800">销售趋势</h3>
-              <button 
-                onClick={() => setShowSalesData(true)}
-                className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
-              >
-                <FileText size={14} />
-                查看数据
-              </button>
+        
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+          {/* Sales Trend */}
+          <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm h-full">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-4">
+                <h3 className="text-lg font-bold text-gray-800">销售趋势</h3>
+                <button 
+                  onClick={() => setShowSalesData(true)}
+                  className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
+                >
+                  <FileText size={14} />
+                  查看数据
+                </button>
+              </div>
+              <TimeRangeSelector range={salesRange} onChange={setSalesRange} color="green" />
             </div>
-            <TimeRangeSelector range={salesRange} onChange={setSalesRange} color="green" />
+            <div className="h-[350px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={c.salesTrend[salesRange === 'week' || salesRange === 'month' ? 'month' : salesRange === 'custom' ? 'day' : salesRange]}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
+                  <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                  <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                  <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
+                  <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
+                  <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
+                  <Area yAxisId="left" type="monotone" dataKey="sales" name="销量" stroke="#10B981" fill="#10B981" fillOpacity={0.1} strokeWidth={3} />
+                  <Area yAxisId="right" type="monotone" dataKey="revenue" name="销售额" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.1} strokeWidth={3} />
+                  <Area yAxisId="left" type="monotone" dataKey="issued" name="颁发量" stroke="#8B5CF6" fill="#8B5CF6" fillOpacity={0.1} strokeWidth={3} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={c.salesTrend[salesRange === 'week' || salesRange === 'month' ? 'month' : salesRange === 'custom' ? 'day' : salesRange]}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
-                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
-                <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
-                <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
-                <Area yAxisId="left" type="monotone" dataKey="sales" name="销量" stroke="#10B981" fill="#10B981" fillOpacity={0.1} strokeWidth={3} />
-                <Area yAxisId="right" type="monotone" dataKey="revenue" name="销售额" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.1} strokeWidth={3} />
-                <Area yAxisId="left" type="monotone" dataKey="issued" name="颁发量" stroke="#8B5CF6" fill="#8B5CF6" fillOpacity={0.1} strokeWidth={3} />
-              </AreaChart>
-            </ResponsiveContainer>
+
+          {/* Sales Conversion Funnel */}
+          <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm h-full flex flex-col">
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="text-lg font-bold text-gray-800">客户层销售转化漏斗</h3>
+              <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
+                {[
+                  { id: 'day', label: '日' },
+                  { id: 'week', label: '周' },
+                  { id: 'month', label: '月' },
+                  { id: 'total', label: '累计' }
+                ].map(r => (
+                  <button 
+                    key={r.id}
+                    onClick={() => setFunnelRange(r.id as any)}
+                    className={cn(
+                      "px-3 py-1 text-[10px] font-bold rounded-lg transition-all",
+                      funnelRange === r.id ? "bg-white text-green-600 shadow-sm" : "text-gray-400 hover:text-gray-600"
+                    )}
+                  >
+                    {r.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="h-[350px] flex flex-col justify-center overflow-auto no-scrollbar py-4">
+              <SalesConversionFunnel 
+                funnel={(MOCK_DASHBOARD_OVERVIEW as any).funnels[2]} 
+                showRepurchase={funnelRange === 'total'} 
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -8441,7 +8598,7 @@ function CertDashboard() {
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-sm font-medium text-gray-700">{item.name}</span>
                     <span className="text-sm font-bold text-gray-900">
-                      {rankingSort === 'count' ? `${item.count}张` : item[rankingSort].toLocaleString()}
+                      {rankingSort === 'count' ? `${item.count}张` : (item[rankingSort] || 0).toLocaleString()}
                     </span>
                   </div>
                   <div className="w-full h-2 bg-gray-50 rounded-full overflow-hidden">
@@ -8486,13 +8643,12 @@ function CertDashboard() {
       <DataViewModal 
         isOpen={showEngagementData}
         onClose={() => setShowEngagementData(false)}
-        title="证书咨询转化数据"
+        title="意向数据详情"
         data={c.contentData.engagement[engagementRange === 'week' || engagementRange === 'month' ? 'month' : engagementRange === 'custom' ? 'day' : engagementRange]}
         columns={[
           { key: 'date', label: '日期' },
           { key: 'inquiries', label: '咨询数' },
-          { key: 'sales', label: '订单数' },
-          { key: 'rate', label: '咨询转化率', format: (v) => `${v}%` }
+          { key: 'sales', label: '收藏数' }
         ]}
       />
 
@@ -8515,26 +8671,85 @@ function CertDashboard() {
 function QuestionDashboard() {
   const [trendRange, setTrendRange] = useState<'day' | 'week' | 'month' | 'custom'>('day');
   const [showTrendData, setShowTrendData] = useState(false);
+  const [statMode, setStatMode] = useState<'added' | 'accumulated'>('accumulated');
+  const [globalRange, setGlobalRange] = useState<'day' | 'week' | 'month'>('week');
   const q = MOCK_QUESTION_DASHBOARD;
   const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4', '#F97316', '#14B8A6'];
   
+  const rangeLabel = globalRange === 'day' ? '本日' : globalRange === 'week' ? '本周' : '本月';
+
+  const stats = [
+    { label: '累计试题', value: (q.totalQuestions || 0).toLocaleString(), icon: <FileText className="text-blue-500" /> },
+    { label: '累计考试人次', value: (q.totalExamsTaken || 0).toLocaleString(), icon: <FileCheck className="text-emerald-500" /> },
+    { label: `${rangeLabel}考试人次`, value: (q.weeklyExamsTaken || 0).toLocaleString(), icon: <TrendingUp className="text-blue-600" /> },
+    { label: `${rangeLabel}新增考试`, value: (q.weeklyNewExams || 0).toLocaleString(), icon: <PlusCircle className="text-purple-500" /> },
+    { label: `${rangeLabel}刷题人次`, value: (q.weeklyPracticeTaken || 0).toLocaleString(), icon: <Activity className="text-indigo-500" /> },
+    { label: `${rangeLabel}新增刷题`, value: (q.weeklyNewPractice || 0).toLocaleString(), icon: <Plus className="text-orange-500" /> },
+  ];
+
   return (
     <div className="space-y-8">
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
-        {[
-          { label: '累计试题', value: q.totalQuestions },
-          { label: '累计考试人次', value: q.totalExamsTaken.toLocaleString() },
-          { label: '本周考试人次', value: q.weeklyExamsTaken.toLocaleString() },
-          { label: '本周新增考试数', value: q.weeklyNewExams },
-          { label: '本周刷题人次', value: q.weeklyPracticeTaken.toLocaleString() },
-          { label: '本周新增刷题数', value: q.weeklyNewPractice },
-        ].map((s, i) => (
-          <div key={i} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
-            <p className="text-sm text-gray-400 font-medium">{s.label}</p>
-            <p className="text-2xl font-bold text-gray-800 mt-1">{s.value}</p>
+      {/* Overall Data Section */}
+      <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm space-y-8">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <h2 className="text-2xl font-bold text-gray-800">整体数据</h2>
+            <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100 ml-4">
+              {[
+                { id: 'added', name: '新增' },
+                { id: 'accumulated', name: '累计' }
+              ].map(mode => (
+                <button 
+                  key={mode.id}
+                  onClick={() => setStatMode(mode.id as any)}
+                  className={cn(
+                    "px-4 py-1.5 text-xs font-bold rounded-lg transition-all",
+                    statMode === mode.id ? "bg-white text-blue-600 shadow-sm" : "text-gray-400 hover:text-gray-600"
+                  )}
+                >
+                  {mode.name}
+                </button>
+              ))}
+            </div>
           </div>
-        ))}
+          
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
+              {[
+                { id: 'day', name: '日' },
+                { id: 'week', name: '周' },
+                { id: 'month', name: '月' }
+              ].map(r => (
+                <button 
+                  key={r.id}
+                  onClick={() => setGlobalRange(r.id as any)}
+                  className={cn(
+                    "px-4 py-1.5 text-xs font-bold rounded-lg transition-all",
+                    globalRange === r.id ? "bg-white text-blue-600 shadow-sm" : "text-gray-400 hover:text-gray-600"
+                  )}
+                >
+                  {r.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+          {stats.map((stat, i) => (
+            <div key={i} className="flex flex-col p-4 rounded-2xl bg-gray-50/50 border border-gray-100/50 transition-all hover:bg-white hover:shadow-md group">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 rounded-xl bg-white shadow-sm text-gray-400 group-hover:text-blue-500 transition-colors">
+                  {stat.icon}
+                </div>
+                <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">{stat.label}</span>
+              </div>
+              <div className="pl-1">
+                <span className="text-2xl font-black text-gray-800 tracking-tight">{stat.value}</span>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Distribution Charts */}
@@ -8639,22 +8854,6 @@ function QuestionDashboard() {
         </div>
       </div>
 
-      {/* Accuracy Comparison */}
-      <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
-        <h3 className="text-lg font-bold text-gray-800 mb-8">各题目分类型正确率对比</h3>
-        <div className="h-[400px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={q.practice.domainRate} layout="vertical" margin={{ left: 40 }}>
-              <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#F3F4F6" />
-              <XAxis type="number" domain={[0, 100]} axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 12}} />
-              <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 12}} width={120} />
-              <Tooltip cursor={{fill: '#F9FAFB'}} contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
-              <Bar dataKey="rate" name="正确率(%)" fill="#10B981" radius={[0, 4, 4, 0]} barSize={20} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
       <DataViewModal 
         isOpen={showTrendData}
         onClose={() => setShowTrendData(false)}
@@ -8700,8 +8899,8 @@ function LearningDashboard() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { label: '累计完课人数', value: l.completion.completed.toLocaleString(), color: 'gray' },
-          { label: '未完成人数', value: l.completion.uncompleted.toLocaleString(), color: 'gray' },
+          { label: '累计完课人数', value: (l.completion.completed || 0).toLocaleString(), color: 'gray' },
+          { label: '未完成人数', value: (l.completion.uncompleted || 0).toLocaleString(), color: 'gray' },
           { label: '人均日刷题量', value: l.practice.avgDailyQuestions, color: 'gray' },
           { label: '人均刷题正确率', value: `${l.practice.avgDailyAccuracy}%`, color: 'gray' },
         ].map((s, i) => (
