@@ -878,8 +878,15 @@ export const MOCK_CERT_DASHBOARD = {
   acquisitionRate: 84.4,
   revenue: 12500,
   conversion: {
-    revenue: 185000
+    revenue: 185000,
+    inquiries: 12500
   },
+  certList: Array.from({ length: 8 }, (_, i) => ({
+    name: ['高级人工智能工程师', '大数据架构师', '高级物联网师', '数字化转型专家', 'Python开发证书', '云计算架构师', '区块链专家', '元宇宙工程师'][i],
+    category: i % 2 === 0 ? '全领域' : '专业技能',
+    issuedCount: Math.floor(Math.random() * 2000) + 500,
+    salesVolume: Math.floor(Math.random() * 500) + 100,
+  })),
   contentData: {
     browsing: {
       day: Array.from({ length: 30 }, (_, i) => ({
@@ -1002,21 +1009,15 @@ export const MOCK_CERT_DASHBOARD = {
       revenue: Math.floor(Math.random() * 40000) + 15000,
       issued: Math.floor(Math.random() * 600) + 200
     }))
-  },
-  certList: Array.from({ length: 5 }, (_, i) => ({
-    id: `CERT${100 + i}`,
-    name: `职业资格证书${i + 1}`,
-    type: i % 2 === 0 ? '专业' : '结业',
-    inquiries: Math.floor(Math.random() * 100) + 20,
-    sales: Math.floor(Math.random() * 50) + 10,
-    issued: Math.floor(Math.random() * 200) + 50
-  }))
+  }
 };
 
 export const MOCK_QUESTION_DASHBOARD = {
   totalQuestions: 5800,
   dailyNew: 120,
   totalExamsTaken: 12500,
+  totalPracticeTaken: 45000,
+  studentCount: 8500,
   weeklyExamsTaken: 850,
   weeklyNewExams: 12,
   weeklyPracticeTaken: 3200,
@@ -1091,7 +1092,9 @@ export const MOCK_CLASS_DASHBOARD = {
   totalHours: 25400,
   completionRate: 58.2,
   conversion: {
-    revenue: 458000
+    revenue: 458000,
+    uv: 12500,
+    inquiries: 3800
   },
   contentData: {
     browsing: {
