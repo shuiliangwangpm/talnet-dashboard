@@ -1078,6 +1078,29 @@ export const MOCK_QUESTION_DASHBOARD = {
       practiceParticipants: Math.floor(Math.random() * 10000) + 4000,
       practicePassCount: Math.floor(Math.random() * 8000) + 3000
     }))
+  },
+  examTypeRanking: {
+    week: [
+      { name: '物联网', participants: 450, count: 12 },
+      { name: '人工智能', participants: 520, count: 15 },
+      { name: '工业互联网', participants: 210, count: 8 },
+      { name: '大数据', participants: 380, count: 10 },
+      { name: '区块链', participants: 150, count: 5 }
+    ],
+    month: [
+      { name: '物联网', participants: 1800, count: 48 },
+      { name: '人工智能', participants: 2200, count: 62 },
+      { name: '工业互联网', participants: 850, count: 32 },
+      { name: '大数据', participants: 1500, count: 42 },
+      { name: '区块链', participants: 600, count: 22 }
+    ],
+    total: [
+      { name: '物联网', participants: 12000, count: 350 },
+      { name: '人工智能', participants: 15000, count: 420 },
+      { name: '工业互联网', participants: 8000, count: 210 },
+      { name: '大数据', participants: 11000, count: 310 },
+      { name: '区块链', participants: 4500, count: 125 }
+    ]
   }
 };
 
