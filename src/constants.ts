@@ -344,7 +344,7 @@ export const MOCK_DASHBOARD_OVERVIEW = {
       const act_pc = Math.floor(Math.random() * 1000) + 2000;
       const act_h5 = Math.floor(Math.random() * 1000) + 2000;
       return {
-        date: `W${i + 1}`,
+        date: `26-W${String(i + 1).padStart(2, '0')}`,
         registered: reg_pc + reg_h5,
         reg_pc,
         reg_h5,
@@ -359,7 +359,7 @@ export const MOCK_DASHBOARD_OVERVIEW = {
       const act_pc = Math.floor(Math.random() * 4000) + 7000;
       const act_h5 = Math.floor(Math.random() * 4000) + 8000;
       return {
-        date: `2023-${String(i + 1).padStart(2, '0')}`,
+        date: `26-${String(i + 1).padStart(2, '0')}`,
         registered: reg_pc + reg_h5,
         reg_pc,
         reg_h5,
@@ -471,13 +471,13 @@ export const MOCK_USER_STATS = {
       h5: Math.floor(Math.random() * 60) + 30
     })),
     week: Array.from({ length: 30 }, (_, i) => ({
-      date: `W${String(i + 1).padStart(2, '0')}`,
+      date: `26-W${String(i + 1).padStart(2, '0')}`,
       value: Math.floor(Math.random() * 500) + 300,
       pc: Math.floor(Math.random() * 200) + 100,
       h5: Math.floor(Math.random() * 300) + 200
     })),
     month: Array.from({ length: 30 }, (_, i) => ({
-      date: `M${String(i + 1).padStart(2, '0')}`,
+      date: `26-${String(i + 1).padStart(2, '0')}`,
       value: Math.floor(Math.random() * 2000) + 1000,
       pc: Math.floor(Math.random() * 800) + 400,
       h5: Math.floor(Math.random() * 1200) + 600
@@ -491,13 +491,13 @@ export const MOCK_USER_STATS = {
       h5: Math.floor(Math.random() * 300) + 500
     })),
     week: Array.from({ length: 30 }, (_, i) => ({
-      date: `W${String(i + 1).padStart(2, '0')}`,
+      date: `26-W${String(i + 1).padStart(2, '0')}`,
       value: Math.floor(Math.random() * 2000) + 4000,
       pc: Math.floor(Math.random() * 800) + 1500,
       h5: Math.floor(Math.random() * 1200) + 2500
     })),
     month: Array.from({ length: 30 }, (_, i) => ({
-      date: `M${String(i + 1).padStart(2, '0')}`,
+      date: `26-${String(i + 1).padStart(2, '0')}`,
       value: Math.floor(Math.random() * 8000) + 15000,
       pc: Math.floor(Math.random() * 3000) + 6000,
       h5: Math.floor(Math.random() * 5000) + 9000
@@ -505,19 +505,19 @@ export const MOCK_USER_STATS = {
   },
   churnTrend: {
     day: Array.from({ length: 30 }, (_, i) => ({
-      date: `04-${String(i + 1).padStart(2, '0')}`,
+      date: `26-04-${String(i + 1).padStart(2, '0')}`,
       value: Math.floor(Math.random() * 20) + 10,
       pc: Math.floor(Math.random() * 8) + 4,
       h5: Math.floor(Math.random() * 12) + 6
     })),
     week: Array.from({ length: 30 }, (_, i) => ({
-      date: `W${String(i + 1).padStart(2, '0')}`,
+      date: `26-W${String(i + 1).padStart(2, '0')}`,
       value: Math.floor(Math.random() * 100) + 50,
       pc: Math.floor(Math.random() * 40) + 20,
       h5: Math.floor(Math.random() * 60) + 30
     })),
     month: Array.from({ length: 30 }, (_, i) => ({
-      date: `M${String(i + 1).padStart(2, '0')}`,
+      date: `26-${String(i + 1).padStart(2, '0')}`,
       value: Math.floor(Math.random() * 400) + 200,
       pc: Math.floor(Math.random() * 150) + 80,
       h5: Math.floor(Math.random() * 250) + 120
@@ -525,19 +525,19 @@ export const MOCK_USER_STATS = {
   },
   recallTrend: {
     day: Array.from({ length: 30 }, (_, i) => ({
-      date: `04-${String(i + 1).padStart(2, '0')}`,
+      date: `26-04-${String(i + 1).padStart(2, '0')}`,
       value: Math.floor(Math.random() * 15) + 5,
       pc: Math.floor(Math.random() * 6) + 2,
       h5: Math.floor(Math.random() * 9) + 3
     })),
     week: Array.from({ length: 30 }, (_, i) => ({
-      date: `W${String(i + 1).padStart(2, '0')}`,
+      date: `26-W${String(i + 1).padStart(2, '0')}`,
       value: Math.floor(Math.random() * 80) + 30,
       pc: Math.floor(Math.random() * 30) + 15,
       h5: Math.floor(Math.random() * 50) + 15
     })),
     month: Array.from({ length: 30 }, (_, i) => ({
-      date: `M${String(i + 1).padStart(2, '0')}`,
+      date: `26-${String(i + 1).padStart(2, '0')}`,
       value: Math.floor(Math.random() * 300) + 100,
       pc: Math.floor(Math.random() * 100) + 50,
       h5: Math.floor(Math.random() * 200) + 50
@@ -545,19 +545,19 @@ export const MOCK_USER_STATS = {
   },
   durationTrend: {
     day: Array.from({ length: 30 }, (_, i) => ({
-      date: `04-${String(i + 1).padStart(2, '0')}`,
+      date: `26-04-${String(i + 1).padStart(2, '0')}`,
       value: Math.floor(Math.random() * 40) + 20,
       pc: Math.floor(Math.random() * 50) + 30,
       h5: Math.floor(Math.random() * 30) + 15
     })),
     week: Array.from({ length: 30 }, (_, i) => ({
-      date: `W${String(i + 1).padStart(2, '0')}`,
+      date: `26-W${String(i + 1).padStart(2, '0')}`,
       value: Math.floor(Math.random() * 45) + 25,
       pc: Math.floor(Math.random() * 55) + 35,
       h5: Math.floor(Math.random() * 35) + 20
     })),
     month: Array.from({ length: 30 }, (_, i) => ({
-      date: `M${String(i + 1).padStart(2, '0')}`,
+      date: `26-${String(i + 1).padStart(2, '0')}`,
       value: Math.floor(Math.random() * 50) + 30,
       pc: Math.floor(Math.random() * 60) + 40,
       h5: Math.floor(Math.random() * 40) + 25
@@ -565,17 +565,17 @@ export const MOCK_USER_STATS = {
   },
   retentionMatrix: {
     day: Array.from({ length: 15 }, (_, i) => ({
-      date: `2026-04-${String(15 - i).padStart(2, '0')}`,
+      date: `26-04-${String(15 - i).padStart(2, '0')}`,
       total: Math.floor(Math.random() * 500) + 500,
       values: Array.from({ length: 15 - i }, (_, j) => Math.floor(Math.random() * 20) + (j === 0 ? 80 : 10))
     })),
     week: Array.from({ length: 15 }, (_, i) => ({
-      date: `2026-W${String(15 - i).padStart(2, '0')}`,
+      date: `26-W${String(15 - i).padStart(2, '0')}`,
       total: Math.floor(Math.random() * 2000) + 2000,
       values: Array.from({ length: 15 - i }, (_, j) => Math.floor(Math.random() * 15) + (j === 0 ? 70 : 5))
     })),
     month: Array.from({ length: 12 }, (_, i) => ({
-      date: `2025-${String(12 - i).padStart(2, '0')}`,
+      date: `25-${String(12 - i).padStart(2, '0')}`,
       total: Math.floor(Math.random() * 8000) + 8000,
       values: Array.from({ length: 12 - i }, (_, j) => Math.floor(Math.random() * 10) + (j === 0 ? 60 : 2))
     }))
@@ -622,35 +622,29 @@ export const MOCK_USER_STATS = {
       { name: '8小时以上', value: 100 }
     ],
     loginFrequencyDistribution: {
+      day: [
+        { name: '1次', value: 3500 },
+        { name: '2-3次', value: 2100 },
+        { name: '4-5次', value: 1200 },
+        { name: '6-10次', value: 800 },
+        { name: '11-20次', value: 400 },
+        { name: '20次+', value: 150 }
+      ],
       week: [
-        { name: '0次', value: 500 },
-        { name: '1次', value: 1200 },
-        { name: '2次', value: 1800 },
-        { name: '3次', value: 1500 },
-        { name: '4次', value: 1200 },
-        { name: '5次', value: 900 },
-        { name: '6次', value: 600 },
-        { name: '7次+', value: 400 }
+        { name: '1-3次', value: 4200 },
+        { name: '4-7次', value: 2800 },
+        { name: '8-15次', value: 1500 },
+        { name: '16-30次', value: 900 },
+        { name: '31-50次', value: 450 },
+        { name: '50次+', value: 200 }
       ],
       month: [
-        { name: '0次', value: 1000 },
-        { name: '1-2次', value: 2500 },
-        { name: '3-5次', value: 1800 },
-        { name: '6-10次', value: 1200 },
-        { name: '11-15次', value: 800 },
-        { name: '16-20次', value: 600 },
-        { name: '21-25次', value: 400 },
-        { name: '26次+', value: 200 }
-      ],
-      year: [
-        { name: '1-10次', value: 4500 },
-        { name: '11-30次', value: 3200 },
-        { name: '31-60次', value: 2400 },
-        { name: '61-100次', value: 1800 },
-        { name: '101-150次', value: 1200 },
-        { name: '151-200次', value: 800 },
-        { name: '201-300次', value: 500 },
-        { name: '301次+', value: 300 }
+        { name: '1-5次', value: 5500 },
+        { name: '6-15次', value: 3800 },
+        { name: '16-30次', value: 2400 },
+        { name: '31-60次', value: 1200 },
+        { name: '61-100次', value: 650 },
+        { name: '100次+', value: 300 }
       ]
     }
   },
@@ -711,7 +705,7 @@ export const MOCK_COURSE_DASHBOARD = {
         uv: Math.floor(Math.random() * 600) + 300
       })),
       week: Array.from({ length: 12 }, (_, i) => ({
-        date: `W${i + 1}`,
+        date: `26-W${String(i + 1).padStart(2, '0')}`,
         pv: Math.floor(Math.random() * 5000) + 2000,
         uv: Math.floor(Math.random() * 3000) + 1000
       })),
@@ -841,12 +835,12 @@ month: [
       revenue: Math.floor(Math.random() * 5000) + 2000
     })),
     week: Array.from({ length: 12 }, (_, i) => ({
-      date: `W${i + 1}`,
+      date: `26-W${String(i + 1).padStart(2, '0')}`,
       sales: Math.floor(Math.random() * 250) + 100,
       revenue: Math.floor(Math.random() * 25000) + 10000
     })),
     month: Array.from({ length: 12 }, (_, i) => ({
-      date: `${i + 1}月`,
+      date: `26-${String(i + 1).padStart(2, '0')}`,
       sales: Math.floor(Math.random() * 1000) + 400,
       revenue: Math.floor(Math.random() * 100000) + 40000
     }))
@@ -895,7 +889,7 @@ export const MOCK_CERT_DASHBOARD = {
         uv: Math.floor(Math.random() * 400) + 150
       })),
       week: Array.from({ length: 12 }, (_, i) => ({
-        date: `W${i + 1}`,
+        date: `26-W${String(i + 1).padStart(2, '0')}`,
         pv: Math.floor(Math.random() * 4000) + 2000,
         uv: Math.floor(Math.random() * 2000) + 1000
       })),
@@ -920,7 +914,7 @@ export const MOCK_CERT_DASHBOARD = {
         const inquiries = Math.floor(Math.random() * 200) + 80;
         const sales = Math.floor(Math.random() * 60) + 20;
         return {
-          date: `W${i + 1}`,
+          date: `26-W${String(i + 1).padStart(2, '0')}`,
           sales,
           inquiries,
           rate: Number(((sales / (inquiries || 1)) * 100).toFixed(1))
@@ -930,7 +924,7 @@ export const MOCK_CERT_DASHBOARD = {
         const inquiries = Math.floor(Math.random() * 800) + 300;
         const sales = Math.floor(Math.random() * 200) + 80;
         return {
-          date: `${i + 1}月`,
+          date: `26-${String(i + 1).padStart(2, '0')}`,
           sales,
           inquiries,
           rate: Number(((sales / (inquiries || 1)) * 100).toFixed(1))
@@ -952,7 +946,7 @@ export const MOCK_CERT_DASHBOARD = {
         const joined = Math.floor(Math.random() * 1000) + 300;
         const acquired = Math.floor(joined * (Math.random() * 0.4 + 0.4));
         return {
-          date: `W${i + 1}`,
+          date: `26-W${String(i + 1).padStart(2, '0')}`,
           joined,
           acquired,
           rate: Number(((acquired / (joined || 1)) * 100).toFixed(1))
@@ -962,7 +956,7 @@ export const MOCK_CERT_DASHBOARD = {
         const joined = Math.floor(Math.random() * 4000) + 1500;
         const acquired = Math.floor(joined * (Math.random() * 0.4 + 0.4));
         return {
-          date: `${i + 1}月`,
+          date: `26-${String(i + 1).padStart(2, '0')}`,
           joined,
           acquired,
           rate: Number(((acquired / (joined || 1)) * 100).toFixed(1))
@@ -998,13 +992,13 @@ export const MOCK_CERT_DASHBOARD = {
       issued: Math.floor(Math.random() * 30) + 10
     })),
     week: Array.from({ length: 12 }, (_, i) => ({
-      date: `W${i + 1}`,
+      date: `26-W${String(i + 1).padStart(2, '0')}`,
       sales: Math.floor(Math.random() * 100) + 30,
       revenue: Math.floor(Math.random() * 10000) + 3000,
       issued: Math.floor(Math.random() * 150) + 50
     })),
     month: Array.from({ length: 12 }, (_, i) => ({
-      date: `${i + 1}月`,
+      date: `26-${String(i + 1).padStart(2, '0')}`,
       sales: Math.floor(Math.random() * 400) + 150,
       revenue: Math.floor(Math.random() * 40000) + 15000,
       issued: Math.floor(Math.random() * 600) + 200
@@ -1017,10 +1011,12 @@ export const MOCK_QUESTION_DASHBOARD = {
   dailyNew: 120,
   totalExamsTaken: 12500,
   totalPracticeTaken: 45000,
+  totalExerciseTaken: 38000,
   studentCount: 8500,
   weeklyExamsTaken: 850,
   weeklyNewExams: 12,
   weeklyPracticeTaken: 3200,
+  weeklyExerciseTaken: 2800,
   weeklyNewPractice: 45,
   typeDistribution: [
     { name: '大数据', value: 9 },
@@ -1062,21 +1058,24 @@ export const MOCK_QUESTION_DASHBOARD = {
       examParticipants: Math.floor(Math.random() * 200) + 50,
       examPassCount: Math.floor(Math.random() * 150) + 30,
       practiceParticipants: Math.floor(Math.random() * 500) + 200,
-      practicePassCount: Math.floor(Math.random() * 400) + 150
+      practicePassCount: Math.floor(Math.random() * 400) + 150,
+      exerciseParticipants: Math.floor(Math.random() * 450) + 150
     })),
     week: Array.from({ length: 12 }, (_, i) => ({
       date: `W${i + 1}`,
       examParticipants: Math.floor(Math.random() * 1000) + 300,
       examPassCount: Math.floor(Math.random() * 800) + 200,
       practiceParticipants: Math.floor(Math.random() * 2500) + 1000,
-      practicePassCount: Math.floor(Math.random() * 2000) + 800
+      practicePassCount: Math.floor(Math.random() * 2000) + 800,
+      exerciseParticipants: Math.floor(Math.random() * 2200) + 900
     })),
     month: Array.from({ length: 12 }, (_, i) => ({
       date: `${i + 1}月`,
       examParticipants: Math.floor(Math.random() * 4000) + 1500,
       examPassCount: Math.floor(Math.random() * 3200) + 1000,
       practiceParticipants: Math.floor(Math.random() * 10000) + 4000,
-      practicePassCount: Math.floor(Math.random() * 8000) + 3000
+      practicePassCount: Math.floor(Math.random() * 8000) + 3000,
+      exerciseParticipants: Math.floor(Math.random() * 9000) + 3500
     }))
   },
   examTypeRanking: {
@@ -1204,44 +1203,32 @@ export const MOCK_CLASS_DASHBOARD = {
         { name: '人工智能', count: 2, pv: 5400, uv: 3300, inquiries: 225, sales: 66 }
       ]
     },
-    position: {
+    direction: {
       total: [
-        { name: '软件工程师', count: 20, pv: 22000, uv: 14000, inquiries: 900, sales: 280 },
-        { name: '人工智能开发工程师', count: 15, pv: 19000, uv: 12000, inquiries: 800, sales: 240 }
+        { name: 'AI技术', count: 20, pv: 22000, uv: 14000, inquiries: 900, sales: 280 },
+        { name: '语音识别', count: 15, pv: 19000, uv: 12000, inquiries: 800, sales: 240 }
       ],
       week: [
-        { name: '软件工程师', count: 2, pv: 2200, uv: 1400, inquiries: 90, sales: 28 }
+        { name: 'AI技术', count: 2, pv: 2200, uv: 1400, inquiries: 90, sales: 28 }
       ],
       month: [
-        { name: '软件工程师', count: 6, pv: 6600, uv: 4200, inquiries: 270, sales: 84 }
-      ]
-    },
-    certification: {
-      total: [
-        { name: '行业认证', count: 25, pv: 28000, uv: 18000, inquiries: 1200, sales: 350 },
-        { name: '数字技术工程师', count: 18, pv: 21000, uv: 13000, inquiries: 850, sales: 260 }
-      ],
-      week: [
-        { name: '行业认证', count: 2, pv: 2800, uv: 1800, inquiries: 120, sales: 35 }
-      ],
-      month: [
-        { name: '行业认证', count: 8, pv: 8400, uv: 5400, inquiries: 360, sales: 105 }
+        { name: 'AI技术', count: 6, pv: 6600, uv: 4200, inquiries: 270, sales: 84 }
       ]
     }
   },
   salesTrend: {
     day: Array.from({ length: 30 }, (_, i) => ({
-      date: `04-${String(i + 1).padStart(2, '0')}`,
+      date: `26-04-${String(i + 1).padStart(2, '0')}`,
       sales: Math.floor(Math.random() * 30) + 10,
       revenue: Math.floor(Math.random() * 10000) + 5000
     })),
     week: Array.from({ length: 12 }, (_, i) => ({
-      date: `W${i + 1}`,
+      date: `26-W${String(i + 1).padStart(2, '0')}`,
       sales: Math.floor(Math.random() * 150) + 50,
       revenue: Math.floor(Math.random() * 50000) + 20000
     })),
     month: Array.from({ length: 12 }, (_, i) => ({
-      date: `${i + 1}月`,
+      date: `26-${String(i + 1).padStart(2, '0')}`,
       sales: Math.floor(Math.random() * 600) + 200,
       revenue: Math.floor(Math.random() * 200000) + 80000
     }))
@@ -1251,17 +1238,17 @@ export const MOCK_CLASS_DASHBOARD = {
 export const MOCK_LEARNING_DASHBOARD = {
   platformTime: {
     day: Array.from({ length: 30 }, (_, i) => ({
-      date: `04-${String(i + 1).padStart(2, '0')}`,
+      date: `26-04-${String(i + 1).padStart(2, '0')}`,
       avgDuration: Math.floor(Math.random() * 60) + 30, // min
       sessionDuration: Math.floor(Math.random() * 20) + 15 // min
     })),
     week: Array.from({ length: 12 }, (_, i) => ({
-      date: `W${i + 1}`,
+      date: `26-W${String(i + 1).padStart(2, '0')}`,
       avgDuration: Math.floor(Math.random() * 400) + 200,
       sessionDuration: Math.floor(Math.random() * 25) + 20
     })),
     month: Array.from({ length: 12 }, (_, i) => ({
-      date: `${i + 1}月`,
+      date: `26-${String(i + 1).padStart(2, '0')}`,
       avgDuration: Math.floor(Math.random() * 1500) + 1000,
       sessionDuration: Math.floor(Math.random() * 30) + 25
     }))
@@ -1301,17 +1288,17 @@ export const MOCK_LEARNING_DASHBOARD = {
     avgDailyAccuracy: 76.5,
     trends: {
       day: Array.from({ length: 30 }, (_, i) => ({
-        date: `04-${String(i + 1).padStart(2, '0')}`,
+        date: `26-04-${String(i + 1).padStart(2, '0')}`,
         questions: Math.floor(Math.random() * 50) + 20,
         accuracy: Math.floor(Math.random() * 30) + 60
       })),
       week: Array.from({ length: 12 }, (_, i) => ({
-        date: `W${i + 1}`,
+        date: `26-W${String(i + 1).padStart(2, '0')}`,
         questions: Math.floor(Math.random() * 300) + 150,
         accuracy: Math.floor(Math.random() * 20) + 70
       })),
       month: Array.from({ length: 12 }, (_, i) => ({
-        date: `${i + 1}月`,
+        date: `26-${String(i + 1).padStart(2, '0')}`,
         questions: Math.floor(Math.random() * 1200) + 800,
         accuracy: Math.floor(Math.random() * 15) + 75
       }))

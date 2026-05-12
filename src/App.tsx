@@ -57,6 +57,7 @@ import {
   RefreshCw,
   UserPlus,
   Layout,
+  Database,
   UserMinus,
   PlusCircle,
   Award,
@@ -185,6 +186,7 @@ export default function App() {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [avatarClickCount, setAvatarClickCount] = useState(0);
   const [isStatsMenuVisible, setIsStatsMenuVisible] = useState(false);
+  const [isDataCenterOpen, setIsDataCenterOpen] = useState(true);
   const [toast, setToast] = useState<string | null>(null);
   const [activeDashboardModule, setActiveDashboardModule] = useState('user');
 
@@ -406,6 +408,54 @@ export default function App() {
                   <>
                     <div className="px-4 py-2 text-xs font-bold text-gray-400 uppercase">管理菜单</div>
                     <div 
+                      className={cn("px-4 py-3 rounded-xl cursor-pointer transition-all mt-1", view === 'admin-dashboard' && activeDashboardModule === 'overview' ? "bg-[#7DC16A] text-white shadow-lg shadow-[#7DC16A]/20" : "text-gray-600 hover:bg-gray-50")}
+                      onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('overview'); setIsMobileMenuOpen(false); }}
+                    >
+                      数据概览
+                    </div>
+                    {/* Data Center Mobile Sub-menu */}
+                    <div className="mt-2">
+                      <div 
+                        className="px-4 py-2 text-xs font-bold text-gray-400 uppercase flex items-center justify-between cursor-pointer"
+                        onClick={() => setIsDataCenterOpen(!isDataCenterOpen)}
+                      >
+                        <span>数据中心</span>
+                        <ChevronDown size={14} className={cn("transition-transform", !isDataCenterOpen && "-rotate-90")} />
+                      </div>
+                      <div className={cn("space-y-1 mt-1 transition-all", !isDataCenterOpen && "hidden")}>
+                        <div 
+                          className={cn("px-4 py-2 rounded-xl cursor-pointer transition-all ml-2", view === 'admin-dashboard' && activeDashboardModule === 'user' ? "bg-[#7DC16A] text-white" : "text-gray-600 hover:bg-gray-50")}
+                          onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('user'); setIsMobileMenuOpen(false); }}
+                        >
+                          用户数据
+                        </div>
+                        <div 
+                          className={cn("px-4 py-2 rounded-xl cursor-pointer transition-all ml-2", view === 'admin-dashboard' && activeDashboardModule === 'course' ? "bg-[#7DC16A] text-white" : "text-gray-600 hover:bg-gray-50")}
+                          onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('course'); setIsMobileMenuOpen(false); }}
+                        >
+                          课程数据
+                        </div>
+                        <div 
+                          className={cn("px-4 py-2 rounded-xl cursor-pointer transition-all ml-2", view === 'admin-dashboard' && activeDashboardModule === 'class' ? "bg-[#7DC16A] text-white" : "text-gray-600 hover:bg-gray-50")}
+                          onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('class'); setIsMobileMenuOpen(false); }}
+                        >
+                          班级数据
+                        </div>
+                        <div 
+                          className={cn("px-4 py-2 rounded-xl cursor-pointer transition-all ml-2", view === 'admin-dashboard' && activeDashboardModule === 'cert' ? "bg-[#7DC16A] text-white" : "text-gray-600 hover:bg-gray-50")}
+                          onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('cert'); setIsMobileMenuOpen(false); }}
+                        >
+                          证书数据
+                        </div>
+                        <div 
+                          className={cn("px-4 py-2 rounded-xl cursor-pointer transition-all ml-2", view === 'admin-dashboard' && activeDashboardModule === 'question' ? "bg-[#7DC16A] text-white" : "text-gray-600 hover:bg-gray-50")}
+                          onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('question'); setIsMobileMenuOpen(false); }}
+                        >
+                          试题数据
+                        </div>
+                      </div>
+                    </div>
+                    <div 
                       className={cn("px-4 py-3 rounded-xl cursor-pointer transition-all mt-1", view === 'admin-course-mgmt' ? "bg-[#7DC16A] text-white shadow-lg shadow-[#7DC16A]/20" : "text-gray-600 hover:bg-gray-50")}
                       onClick={() => { setView('admin-course-mgmt'); setIsMobileMenuOpen(false); }}
                     >
@@ -450,42 +500,6 @@ export default function App() {
                       </div>
                     )}
                     <div 
-                      className={cn("px-4 py-3 rounded-xl cursor-pointer transition-all mt-1", view === 'admin-dashboard' && activeDashboardModule === 'user' ? "bg-[#7DC16A] text-white shadow-lg shadow-[#7DC16A]/20" : "text-gray-600 hover:bg-gray-50")}
-                      onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('user'); setIsMobileMenuOpen(false); }}
-                    >
-                      用户数据
-                    </div>
-                    <div 
-                      className={cn("px-4 py-3 rounded-xl cursor-pointer transition-all mt-1", view === 'admin-dashboard' && activeDashboardModule === 'course' ? "bg-[#7DC16A] text-white shadow-lg shadow-[#7DC16A]/20" : "text-gray-600 hover:bg-gray-50")}
-                      onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('course'); setIsMobileMenuOpen(false); }}
-                    >
-                      课程数据
-                    </div>
-                    <div 
-                      className={cn("px-4 py-3 rounded-xl cursor-pointer transition-all mt-1", view === 'admin-dashboard' && activeDashboardModule === 'class' ? "bg-[#7DC16A] text-white shadow-lg shadow-[#7DC16A]/20" : "text-gray-600 hover:bg-gray-50")}
-                      onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('class'); setIsMobileMenuOpen(false); }}
-                    >
-                      班级数据
-                    </div>
-                    <div 
-                      className={cn("px-4 py-3 rounded-xl cursor-pointer transition-all mt-1", view === 'admin-dashboard' && activeDashboardModule === 'cert' ? "bg-[#7DC16A] text-white shadow-lg shadow-[#7DC16A]/20" : "text-gray-600 hover:bg-gray-50")}
-                      onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('cert'); setIsMobileMenuOpen(false); }}
-                    >
-                      证书数据
-                    </div>
-                    <div 
-                      className={cn("px-4 py-3 rounded-xl cursor-pointer transition-all mt-1", view === 'admin-dashboard' && activeDashboardModule === 'question' ? "bg-[#7DC16A] text-white shadow-lg shadow-[#7DC16A]/20" : "text-gray-600 hover:bg-gray-50")}
-                      onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('question'); setIsMobileMenuOpen(false); }}
-                    >
-                      试题数据
-                    </div>
-                    <div 
-                      className={cn("px-4 py-3 rounded-xl cursor-pointer transition-all mt-1", view === 'admin-dashboard' && activeDashboardModule === 'data-table' ? "bg-[#7DC16A] text-white shadow-lg shadow-[#7DC16A]/20" : "text-gray-600 hover:bg-gray-50")}
-                      onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('data-table'); setIsMobileMenuOpen(false); }}
-                    >
-                      数据表格
-                    </div>
-                    <div 
                       className={cn("px-4 py-3 rounded-xl cursor-pointer transition-all mt-1", view === 'admin-org-user-mgmt' ? "bg-[#7DC16A] text-white shadow-lg shadow-[#7DC16A]/20" : "text-gray-600 hover:bg-gray-50")}
                       onClick={() => { setView('admin-org-user-mgmt'); setIsMobileMenuOpen(false); }}
                     >
@@ -504,6 +518,84 @@ export default function App() {
         {isAdminMode && (
           <aside className="w-64 min-h-[calc(100vh-64px)] bg-white border-r border-gray-100 p-4 hidden md:block">
             <div className="space-y-1">
+              <div 
+                className={cn(
+                  "flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all",
+                  view === 'admin-dashboard' && activeDashboardModule === 'overview' ? "bg-[#7DC16A] text-white shadow-lg shadow-[#7DC16A]/20" : "text-gray-600 hover:bg-gray-50"
+                )}
+                onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('overview'); }}
+              >
+                <BarChart3 size={18} />
+                <span className="font-medium">数据概览</span>
+              </div>
+
+              {/* Data Center Desktop Sub-menu */}
+              <div className="pt-2">
+                <div 
+                  className="flex items-center justify-between px-4 py-2 cursor-pointer group"
+                  onClick={() => setIsDataCenterOpen(!isDataCenterOpen)}
+                >
+                  <div className="flex items-center gap-3 text-gray-400 group-hover:text-gray-600 transition-colors">
+                    <Database size={18} />
+                    <span className="text-xs font-bold uppercase tracking-wider">数据中心</span>
+                  </div>
+                  <ChevronDown size={14} className={cn("text-gray-300 transition-transform", !isDataCenterOpen && "-rotate-90")} />
+                </div>
+                
+                <div className={cn("space-y-1 mt-1 overflow-hidden transition-all", isDataCenterOpen ? "max-h-96" : "max-h-0")}>
+                  <div 
+                    className={cn(
+                      "flex items-center gap-3 px-4 py-2 ml-4 rounded-xl cursor-pointer transition-all",
+                      view === 'admin-dashboard' && activeDashboardModule === 'user' ? "bg-[#7DC16A] text-white" : "text-gray-600 hover:bg-gray-50"
+                    )}
+                    onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('user'); }}
+                  >
+                    <Users size={16} />
+                    <span className="text-sm font-medium">用户数据</span>
+                  </div>
+                  <div 
+                    className={cn(
+                      "flex items-center gap-3 px-4 py-2 ml-4 rounded-xl cursor-pointer transition-all",
+                      view === 'admin-dashboard' && activeDashboardModule === 'course' ? "bg-[#7DC16A] text-white" : "text-gray-600 hover:bg-gray-50"
+                    )}
+                    onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('course'); }}
+                  >
+                    <BookOpen size={16} />
+                    <span className="text-sm font-medium">课程数据</span>
+                  </div>
+                  <div 
+                    className={cn(
+                      "flex items-center gap-3 px-4 py-2 ml-4 rounded-xl cursor-pointer transition-all",
+                      view === 'admin-dashboard' && activeDashboardModule === 'class' ? "bg-[#7DC16A] text-white" : "text-gray-600 hover:bg-gray-50"
+                    )}
+                    onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('class'); }}
+                  >
+                    <Layout size={16} />
+                    <span className="text-sm font-medium">班级数据</span>
+                  </div>
+                  <div 
+                    className={cn(
+                      "flex items-center gap-3 px-4 py-2 ml-4 rounded-xl cursor-pointer transition-all",
+                      view === 'admin-dashboard' && activeDashboardModule === 'cert' ? "bg-[#7DC16A] text-white" : "text-gray-600 hover:bg-gray-50"
+                    )}
+                    onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('cert'); }}
+                  >
+                    <ShieldCheck size={16} />
+                    <span className="text-sm font-medium">证书数据</span>
+                  </div>
+                  <div 
+                    className={cn(
+                      "flex items-center gap-3 px-4 py-2 ml-4 rounded-xl cursor-pointer transition-all",
+                      view === 'admin-dashboard' && activeDashboardModule === 'question' ? "bg-[#7DC16A] text-white" : "text-gray-600 hover:bg-gray-50"
+                    )}
+                    onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('question'); }}
+                  >
+                    <HelpCircle size={16} />
+                    <span className="text-sm font-medium">试题数据</span>
+                  </div>
+                </div>
+              </div>
+
               <div 
                 className={cn(
                   "flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all",
@@ -565,56 +657,6 @@ export default function App() {
                 <span className="font-medium">租户直播</span>
               </div>
               
-              <div 
-                className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all",
-                  view === 'admin-dashboard' && activeDashboardModule === 'user' ? "bg-[#7DC16A] text-white shadow-lg shadow-[#7DC16A]/20" : "text-gray-600 hover:bg-gray-50"
-                )}
-                onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('user'); }}
-              >
-                <Users size={18} />
-                <span className="font-medium">用户数据</span>
-              </div>
-              <div 
-                className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all",
-                  view === 'admin-dashboard' && activeDashboardModule === 'course' ? "bg-[#7DC16A] text-white shadow-lg shadow-[#7DC16A]/20" : "text-gray-600 hover:bg-gray-50"
-                )}
-                onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('course'); }}
-              >
-                <BookOpen size={18} />
-                <span className="font-medium">课程数据</span>
-              </div>
-              <div 
-                className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all",
-                  view === 'admin-dashboard' && activeDashboardModule === 'class' ? "bg-[#7DC16A] text-white shadow-lg shadow-[#7DC16A]/20" : "text-gray-600 hover:bg-gray-50"
-                )}
-                onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('class'); }}
-              >
-                <Layout size={18} />
-                <span className="font-medium">班级数据</span>
-              </div>
-              <div 
-                className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all",
-                  view === 'admin-dashboard' && activeDashboardModule === 'cert' ? "bg-[#7DC16A] text-white shadow-lg shadow-[#7DC16A]/20" : "text-gray-600 hover:bg-gray-50"
-                )}
-                onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('cert'); }}
-              >
-                <ShieldCheck size={18} />
-                <span className="font-medium">证书数据</span>
-              </div>
-              <div 
-                className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all",
-                  view === 'admin-dashboard' && activeDashboardModule === 'question' ? "bg-[#7DC16A] text-white shadow-lg shadow-[#7DC16A]/20" : "text-gray-600 hover:bg-gray-50"
-                )}
-                onClick={() => { setView('admin-dashboard'); setActiveDashboardModule('question'); }}
-              >
-                <HelpCircle size={18} />
-                <span className="font-medium">试题数据</span>
-              </div>
               <div 
                 className={cn(
                   "flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all",
@@ -6032,10 +6074,10 @@ function DataViewModal({
   );
 }
 
-function SalesConversionFunnel({ funnel, fullWidth = false, range = 'week' }: { funnel: any, fullWidth?: boolean, range?: string }) {
+function SalesConversionFunnel({ funnel, fullWidth = false, range = 'week', subValue }: { funnel: any, fullWidth?: boolean, range?: string, subValue?: string }) {
   if (!funnel) return null;
 
-  const showsRepurchase = range === 'year' || range === 'total';
+  const showsRepurchase = range === 'month' || range === 'year' || range === 'total';
   // Robust field access with fallbacks to avoid toLocaleString() on undefined
   const browsing = funnel.browsing || funnel.uv || funnel.pv || 0;
   const consultation = funnel.consultation || funnel.inquiries || 0;
@@ -6048,6 +6090,13 @@ function SalesConversionFunnel({ funnel, fullWidth = false, range = 'week' }: { 
 
   return (
     <div className={cn("space-y-8", fullWidth ? "w-full flex flex-col items-center" : "w-full")}>
+      {(range === 'month' || range === 'year') && subValue && (
+        <div className="text-center">
+          <span className="px-3 py-1 bg-gray-50 text-gray-400 text-[10px] font-bold rounded-lg border border-gray-100">
+            {range === 'year' ? `${subValue}年度` : `${subValue.split('-')[0]}年${subValue.split('-')[1]}月`}
+          </span>
+        </div>
+      )}
       <div className={cn("flex flex-col items-center", fullWidth ? "w-full max-w-4xl" : "w-full")}>
         {/* Visual Funnel */}
         <div className="w-full space-y-2">
@@ -6076,7 +6125,7 @@ function SalesConversionFunnel({ funnel, fullWidth = false, range = 'week' }: { 
                 <div className="p-2 bg-indigo-50 rounded-lg text-indigo-500 shadow-lg shadow-indigo-500/10">
                   <MessageSquare size={18} />
                 </div>
-                <span className="text-sm font-bold text-indigo-600">咨询人次</span>
+                <span className="text-sm font-bold text-indigo-600">咨询数</span>
               </div>
               <div className="flex flex-col items-end">
                 <span className="text-xl font-black text-indigo-700">{consultation.toLocaleString()}</span>
@@ -6251,34 +6300,6 @@ function DashboardOverview() {
                 </button>
               ))}
             </div>
-
-            <select 
-              value={selectedSubValue}
-              onChange={(e) => setSelectedSubValue(e.target.value)}
-              className="px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#7DC16A]/20 min-w-[140px]"
-            >
-              {globalRange === 'day' && (
-                <>
-                  <option value="2023-04-21">2023-04-21</option>
-                  <option value="2023-04-20">2023-04-20</option>
-                  <option value="2023-04-19">2023-04-19</option>
-                </>
-              )}
-              {globalRange === 'week' && (
-                <>
-                  <option value="2023-W16">2023年 第16周</option>
-                  <option value="2023-W15">2023年 第15周</option>
-                  <option value="2023-W14">2023年 第14周</option>
-                </>
-              )}
-              {globalRange === 'month' && (
-                <>
-                  <option value="2023-04">2023年 04月</option>
-                  <option value="2023-03">2023年 03月</option>
-                  <option value="2023-02">2023年 02月</option>
-                </>
-              )}
-            </select>
           </div>
         </div>
 
@@ -6429,35 +6450,7 @@ function DashboardOverview() {
                 查看数据
               </button>
             </div>
-            <div className="flex items-center gap-4">
-              {salesRange !== 'custom' && (
-                <select 
-                  value={salesSubValue}
-                  onChange={(e) => setSalesSubValue(e.target.value)}
-                  className="text-xs font-bold text-gray-400 bg-gray-50 border border-gray-100 px-3 py-1.5 rounded-xl outline-none cursor-pointer"
-                >
-                  {salesRange === 'day' && (
-                    <>
-                      <option value="2023-04-21">2023-04-21</option>
-                      <option value="2023-04-20">2023-04-20</option>
-                    </>
-                  )}
-                  {salesRange === 'week' && (
-                    <>
-                      <option value="2023-W16">2023-W16</option>
-                      <option value="2023-W15">2023-W15</option>
-                    </>
-                  )}
-                  {salesRange === 'month' && (
-                    <>
-                      <option value="2023-04">2023-04</option>
-                      <option value="2023-03">2023-03</option>
-                    </>
-                  )}
-                </select>
-              )}
-              <TimeRangeSelector range={salesRange} onChange={setSalesRange} color="blue" />
-            </div>
+            <TimeRangeSelector range={salesRange} onChange={setSalesRange} color="blue" />
           </div>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -6489,7 +6482,7 @@ function DashboardOverview() {
       <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
         <h3 className="text-lg font-bold text-gray-800 mb-8">销售转化漏斗</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
-           <SalesConversionFunnel funnel={(MOCK_DASHBOARD_OVERVIEW as any).funnels[0]} range={globalRange} />
+           <SalesConversionFunnel funnel={(MOCK_DASHBOARD_OVERVIEW as any).funnels[0]} range={globalRange} subValue={selectedSubValue} />
         </div>
       </div>
 
@@ -6528,7 +6521,7 @@ function DashboardOverview() {
                   <option value="sales">按销量</option>
                   <option value="revenue">按销售额</option>
                   <option value="views">按浏览量</option>
-                  <option value="consultation">按咨询人次</option>
+                  <option value="consultation">按咨询量</option>
                 </>
               ) : (
                 <>
@@ -6571,7 +6564,7 @@ function DashboardOverview() {
               <option value="revenue">按销售额</option>
               <option value="views">按浏览量</option>
               <option value="joined">按加入人次</option>
-              <option value="consultation">按咨询人次</option>
+              <option value="consultation">按咨询量</option>
             </select>
           </div>
           <div className="space-y-6">
@@ -6608,7 +6601,7 @@ function DashboardOverview() {
               <option value="revenue">按销售额</option>
               <option value="views">按浏览量</option>
               <option value="joined">按加入人次</option>
-              <option value="consultation">按咨询人次</option>
+              <option value="consultation">按咨询量</option>
             </select>
           </div>
           <div className="space-y-6">
@@ -6732,6 +6725,7 @@ function UserDashboard() {
   const [showActivityData, setShowActivityData] = useState(false);
   const [showChurnData, setShowChurnData] = useState(false);
   const [showDurationData, setShowDurationData] = useState(false);
+  const [showDurationDistData, setShowDurationDistData] = useState(false);
   const [showFreqData, setShowFreqData] = useState(false);
   const logsPerPage = 10;
   
@@ -7062,7 +7056,7 @@ function UserDashboard() {
       <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
           <div className="flex items-center gap-4">
-            <h3 className="text-lg font-bold text-gray-800">用户在线平均时长</h3>
+            <h3 className="text-lg font-bold text-gray-800">用户平均在线时长</h3>
             <button 
               onClick={() => setShowDurationData(true)}
               className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all"
@@ -7094,7 +7088,16 @@ function UserDashboard() {
         {/* Online Duration Distribution */}
         <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
           <div className="flex items-center justify-between mb-8">
-            <h3 className="text-lg font-bold text-gray-800">用户在线时长分布</h3>
+            <div className="flex items-center gap-4">
+              <h3 className="text-lg font-bold text-gray-800">用户在线时长分布</h3>
+              <button 
+                onClick={() => setShowDurationDistData(true)}
+                className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all"
+              >
+                <FileText size={14} />
+                查看数据
+              </button>
+            </div>
             <div className="flex items-center gap-4">
               <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
                 {[
@@ -7474,12 +7477,23 @@ function UserDashboard() {
       <DataViewModal 
         isOpen={showDurationData}
         onClose={() => setShowDurationData(false)}
-        title="用户在线时长数据"
+        title="用户平均在线时长数据"
         data={MOCK_USER_STATS.durationTrend[durationRange === 'week' || durationRange === 'month' ? 'month' : durationRange === 'custom' ? 'day' : durationRange]}
         columns={[
           { key: 'date', label: '日期' },
           { key: 'pc', label: 'PC端时长(min)' },
           { key: 'h5', label: 'H5端时长(min)' }
+        ]}
+      />
+
+      <DataViewModal 
+        isOpen={showDurationDistData}
+        onClose={() => setShowDurationDistData(false)}
+        title="用户在线时长分布数据"
+        data={(MOCK_USER_STATS as any).distribution.onlineDurationDistribution}
+        columns={[
+          { key: 'name', label: '时间段' },
+          { key: 'value', label: '用户数' }
         ]}
       />
 
@@ -7493,6 +7507,52 @@ function UserDashboard() {
           { key: 'value', label: '用户数' }
         ]}
       />
+    </div>
+  );
+}
+
+function DateSelector({ range, value, onChange }: { range: 'month' | 'year' | 'total', value: string, onChange: (val: string) => void }) {
+  if (range === 'total') return null;
+
+  const currentYear = value.split('-')[0] || '2023';
+  const currentMonth = value.split('-')[1] || '04';
+
+  return (
+    <div className="flex items-center gap-2 ml-4">
+      {range === 'year' && (
+        <select 
+          value={currentYear} 
+          onChange={(e) => onChange(e.target.value)}
+          className="text-[10px] font-bold text-gray-500 bg-gray-50 border border-gray-100 rounded-lg px-2 py-1 outline-none appearance-none"
+        >
+          {['2024', '2023', '2022'].map(y => (
+            <option key={y} value={y}>{y}年</option>
+          ))}
+        </select>
+      )}
+      {range === 'month' && (
+        <div className="flex items-center gap-1">
+          <select 
+            value={currentYear} 
+            onChange={(e) => onChange(`${e.target.value}-${currentMonth}`)}
+            className="text-[10px] font-bold text-gray-500 bg-gray-50 border border-gray-100 rounded-lg px-2 py-1 outline-none appearance-none"
+          >
+            {['2024', '2023'].map(y => (
+              <option key={y} value={y}>{y}年</option>
+            ))}
+          </select>
+          <select 
+            value={currentMonth} 
+            onChange={(e) => onChange(`${currentYear}-${e.target.value}`)}
+            className="text-[10px] font-bold text-gray-500 bg-gray-50 border border-gray-100 rounded-lg px-2 py-1 outline-none appearance-none"
+          >
+            {Array.from({ length: 12 }, (_, i) => {
+              const m = (i + 1).toString().padStart(2, '0');
+              return <option key={m} value={m}>{m}月</option>;
+            })}
+          </select>
+        </div>
+      )}
     </div>
   );
 }
@@ -7577,18 +7637,18 @@ function CourseDashboard() {
 
   const stats = statMode === 'accumulated' ? [
     { label: '累计上架课程', value: (c.totalPublished || 0).toLocaleString(), icon: <BookOpen className="text-blue-500" /> },
+    { label: '课程合计课时', value: `${(c.totalHours || 0).toLocaleString()}h`, icon: <Clock className="text-orange-500" /> },
     { label: '累计销售量', value: (c.totalSalesVolume || 0).toLocaleString(), icon: <TrendingUp className="text-green-500" /> },
     { label: '累计销售额', value: `¥${(c.conversion?.revenue || 0).toLocaleString()}`, icon: <BarChart3 className="text-purple-500" /> },
     { label: '累计课程学习人数', value: (c.studentCount || 0).toLocaleString(), icon: <Users className="text-indigo-500" /> },
-    { label: '课程合计课时', value: `${(c.totalHours || 0).toLocaleString()}h`, icon: <Clock className="text-orange-500" /> },
-    { label: '累计人均课时', value: `${c.avgHours || 0}h`, icon: <UserIcon className="text-blue-400" /> },
+    { label: '累计人均完成课时', value: `${c.avgHours || 0}h`, icon: <UserIcon className="text-blue-400" /> },
   ] : [
     { label: `${rangeLabel}上架课程`, value: (c.weeklyNew || 0).toLocaleString(), icon: <Plus className="text-cyan-500" /> },
+    { label: `${rangeLabel}上架课程课时`, value: `${Math.floor((c.totalHours || 0) * 1.5).toLocaleString()}h`, icon: <Clock className="text-orange-400" /> },
     { label: `${rangeLabel}销售量`, value: (c.periodSales || 0).toLocaleString(), icon: <TrendingUp className="text-emerald-500" /> },
     { label: `${rangeLabel}销售额`, value: `¥${(c.periodRevenue || 0).toLocaleString()}`, icon: <BarChart3 className="text-blue-600" /> },
     { label: `${rangeLabel}加入课程人数`, value: Math.floor((c.studentCount || 0) * 0.15).toLocaleString(), icon: <Users className="text-indigo-400" /> },
-    { label: `${rangeLabel}课时`, value: `${Math.floor((c.totalHours || 0) * 1.5).toLocaleString()}h`, icon: <Clock className="text-orange-400" /> },
-    { label: `${rangeLabel}人均课时`, value: `${((c.avgHours || 0) * 1.2).toFixed(1)}h`, icon: <UserIcon className="text-blue-300" /> },
+    { label: `${rangeLabel}人均完成课时`, value: `${((c.avgHours || 0) * 1.2).toFixed(1)}h`, icon: <UserIcon className="text-blue-300" /> },
   ];
 
   return (
@@ -7761,7 +7821,7 @@ function CourseDashboard() {
                   <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
                   <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
                   <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
-                  <Line yAxisId="left" type="monotone" dataKey="inquiries" name="咨询人次" stroke="#F59E0B" strokeWidth={3} dot={{r: 4}} />
+                  <Line yAxisId="left" type="monotone" dataKey="inquiries" name="咨询数" stroke="#F59E0B" strokeWidth={3} dot={{r: 4}} />
                   <Line yAxisId="left" type="monotone" dataKey="sales" name="收藏数" stroke="#EF4444" strokeWidth={3} dot={{r: 4}} />
                 </LineChart>
               </ResponsiveContainer>
@@ -7820,35 +7880,7 @@ function CourseDashboard() {
                   查看数据
                 </button>
               </div>
-              <div className="flex items-center gap-4">
-                {salesRange !== 'custom' && (
-                  <select 
-                    value={salesSubValue}
-                    onChange={(e) => setSalesSubValue(e.target.value)}
-                    className="text-[10px] font-bold text-gray-400 bg-gray-50 border border-gray-100 px-2 py-1 rounded-lg outline-none cursor-pointer"
-                  >
-                    {salesRange === 'day' && (
-                      <>
-                        <option value="2023-04-21">2023-04-21</option>
-                        <option value="2023-04-20">2023-04-20</option>
-                      </>
-                    )}
-                    {salesRange === 'week' && (
-                      <>
-                        <option value="2023-W16">2023-W16</option>
-                        <option value="2023-W15">2023-W15</option>
-                      </>
-                    )}
-                    {salesRange === 'month' && (
-                      <>
-                        <option value="2023-04">2023-04</option>
-                        <option value="2023-03">2023-03</option>
-                      </>
-                    )}
-                  </select>
-                )}
-                <TimeRangeSelector range={salesRange} onChange={setSalesRange} color="green" />
-              </div>
+              <TimeRangeSelector range={salesRange} onChange={setSalesRange} color="green" />
             </div>
             <div className="h-[350px]">
               <ResponsiveContainer width="100%" height="100%">
@@ -7870,51 +7902,33 @@ function CourseDashboard() {
           <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm h-full flex flex-col">
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-lg font-bold text-gray-800">客户层销售转化漏斗</h3>
-              <div className="flex items-center gap-3">
-                {funnelRange !== 'total' && (
-                  <select 
-                    value={funnelSubValue}
-                    onChange={(e) => setFunnelSubValue(e.target.value)}
-                    className="text-[10px] font-bold text-gray-400 bg-gray-50 border border-gray-100 px-2 py-1 rounded-lg outline-none cursor-pointer"
-                  >
-                    {funnelRange === 'month' && (
-                      <>
-                        <option value="2023-04">2023年 04月</option>
-                        <option value="2023-03">2023年 03月</option>
-                      </>
-                    )}
-                    {funnelRange === 'year' && (
-                      <>
-                        <option value="2023">2023年</option>
-                        <option value="2022">2022年</option>
-                      </>
-                    )}
-                  </select>
-                )}
+              <div className="flex items-center gap-2">
                 <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
                   {[
                     { id: 'month', label: '月' },
                     { id: 'year', label: '年' },
                     { id: 'total', label: '累计' }
                   ].map(r => (
-                    <button 
-                      key={r.id}
-                      onClick={() => setFunnelRange(r.id as any)}
-                      className={cn(
-                        "px-3 py-1 text-[10px] font-bold rounded-lg transition-all",
-                        funnelRange === r.id ? "bg-white text-green-600 shadow-sm" : "text-gray-400 hover:text-gray-600"
-                      )}
-                    >
-                      {r.label}
-                    </button>
-                  ))}
+                      <button 
+                        key={r.id}
+                        onClick={() => setFunnelRange(r.id as any)}
+                        className={cn(
+                          "px-3 py-1 text-[10px] font-bold rounded-lg transition-all",
+                          funnelRange === r.id ? "bg-white text-green-600 shadow-sm" : "text-gray-400 hover:text-gray-600"
+                        )}
+                      >
+                        {r.label}
+                      </button>
+                    ))}
+                  </div>
+                  <DateSelector range={funnelRange} value={funnelSubValue} onChange={setFunnelSubValue} />
                 </div>
               </div>
-            </div>
             <div className="h-[350px] flex flex-col justify-center overflow-auto no-scrollbar py-4">
               <SalesConversionFunnel 
                 funnel={(MOCK_DASHBOARD_OVERVIEW as any).funnels[1]} 
                 range={funnelRange} 
+                subValue={funnelSubValue}
               />
             </div>
           </div>
@@ -8057,7 +8071,7 @@ function CourseDashboard() {
         data={getRankingData()}
         columns={[
           { key: 'name', label: '名称' },
-          { key: rankingSort, label: rankingSort === 'revenue' ? '销售额' : rankingSort === 'sales' ? '销量' : rankingSort === 'inquiries' ? '咨询人次' : rankingSort.toUpperCase() },
+          { key: rankingSort, label: rankingSort === 'revenue' ? '销售额' : rankingSort === 'sales' ? '销量' : rankingSort === 'inquiries' ? '咨询数' : rankingSort.toUpperCase() },
         ]}
       />
 
@@ -8068,7 +8082,7 @@ function CourseDashboard() {
         data={getRankingData()}
         columns={[
           { key: 'name', label: '名称' },
-          { key: rankingSort, label: rankingSort === 'revenue' ? '销售额' : rankingSort === 'sales' ? '销量' : rankingSort === 'inquiries' ? '咨询人次' : rankingSort.toUpperCase() },
+          { key: rankingSort, label: rankingSort === 'revenue' ? '销售额' : rankingSort === 'sales' ? '销量' : rankingSort === 'inquiries' ? '咨询数' : rankingSort.toUpperCase() },
         ]}
       />
 
@@ -8091,7 +8105,7 @@ function CourseDashboard() {
         data={c.contentData.engagement[engagementRange === 'week' || engagementRange === 'month' ? 'month' : engagementRange === 'custom' ? 'day' : engagementRange]}
         columns={[
           { key: 'date', label: '日期' },
-          { key: 'inquiries', label: '咨询人次' },
+          { key: 'inquiries', label: '咨询数' },
           { key: 'sales', label: '收藏数' }
         ]}
       />
@@ -8127,7 +8141,7 @@ function ClassDashboard() {
   const [learningRange, setLearningRange] = useState<'day' | 'week' | 'month' | 'custom'>('day');
   const [salesRange, setSalesRange] = useState<'day' | 'week' | 'month' | 'custom'>('day');
   const [funnelRange, setFunnelRange] = useState<'month' | 'year' | 'total'>('total');
-  const [rankingType, setRankingType] = useState<'domain' | 'position' | 'certification'>('domain');
+  const [rankingType, setRankingType] = useState<'domain' | 'direction' | 'certification'>('domain');
   const [rankingRange, setRankingRange] = useState<'week' | 'month' | 'total'>('total');
   const [rankingSort, setRankingSort] = useState<'count' | 'pv' | 'uv' | 'inquiries' | 'sales' | 'revenue'>('count');
   
@@ -8181,13 +8195,13 @@ function ClassDashboard() {
     { label: '累计销售量', value: (c.totalSalesVolume || 0).toLocaleString(), icon: <TrendingUp className="text-green-500" /> },
     { label: '累计销售额', value: `¥${(c.conversion?.revenue || 0).toLocaleString()}`, icon: <BarChart3 className="text-purple-500" /> },
     { label: '累计班级学习人次', value: (c.studentCount || 0).toLocaleString(), icon: <Users className="text-indigo-500" /> },
-    { label: '累计班级毕业人次', value: `${(c as any).graduatedCount || 0}人`, icon: <CheckCircle2 className="text-emerald-500" /> },
+    { label: '累计班级颁发人次', value: `${(c as any).graduatedCount || 0}人`, icon: <CheckCircle2 className="text-emerald-500" /> },
   ] : [
     { label: `${rangeLabel}上架班级`, value: (c.weeklyNew || 0).toLocaleString(), icon: <Plus className="text-cyan-500" /> },
     { label: `${rangeLabel}销售量`, value: (c.periodSales || 0).toLocaleString(), icon: <TrendingUp className="text-emerald-500" /> },
     { label: `${rangeLabel}销售额`, value: `¥${(c.periodRevenue || 0).toLocaleString()}`, icon: <BarChart3 className="text-blue-600" /> },
     { label: `${rangeLabel}加入班级人次`, value: Math.floor((c.studentCount || 0) * 0.12).toLocaleString(), icon: <Users className="text-indigo-400" /> },
-    { label: `${rangeLabel}班级毕业人次`, value: `${Math.floor(((c as any).graduatedCount || 0) * 0.1)}人`, icon: <CheckCircle2 className="text-emerald-400" /> },
+    { label: `${rangeLabel}班级颁发人次`, value: `${Math.floor(((c as any).graduatedCount || 0) * 0.1)}人`, icon: <CheckCircle2 className="text-emerald-400" /> },
   ];
 
   return (
@@ -8359,7 +8373,7 @@ function ClassDashboard() {
                   <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
                   <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
                   <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
-                  <Line yAxisId="left" type="monotone" dataKey="inquiries" name="咨询人次" stroke="#F59E0B" strokeWidth={3} dot={{r: 4}} />
+                  <Line yAxisId="left" type="monotone" dataKey="inquiries" name="咨询数" stroke="#F59E0B" strokeWidth={3} dot={{r: 4}} />
                   <Line yAxisId="left" type="monotone" dataKey="sales" name="收藏数" stroke="#EF4444" strokeWidth={3} dot={{r: 4}} />
                 </LineChart>
               </ResponsiveContainer>
@@ -8389,7 +8403,7 @@ function ClassDashboard() {
                   <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
                   <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
                   <Line type="monotone" dataKey="joined" name="加入人次" stroke="#3B82F6" strokeWidth={3} dot={{r: 4}} />
-                  <Line type="monotone" dataKey="completed" name="毕业人次" stroke="#10B981" strokeWidth={3} dot={{r: 4}} />
+                  <Line type="monotone" dataKey="completed" name="颁发人次" stroke="#10B981" strokeWidth={3} dot={{r: 4}} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -8418,35 +8432,7 @@ function ClassDashboard() {
                   查看数据
                 </button>
               </div>
-              <div className="flex items-center gap-4">
-                {salesRange !== 'custom' && (
-                  <select 
-                    value={salesSubValue}
-                    onChange={(e) => setSalesSubValue(e.target.value)}
-                    className="text-[10px] font-bold text-gray-400 bg-gray-50 border border-gray-100 px-2 py-1 rounded-lg outline-none cursor-pointer"
-                  >
-                    {salesRange === 'day' && (
-                      <>
-                        <option value="2023-04-21">2023-04-21</option>
-                        <option value="2023-04-20">2023-04-20</option>
-                      </>
-                    )}
-                    {salesRange === 'week' && (
-                      <>
-                        <option value="2023-W16">2023-W16</option>
-                        <option value="2023-W15">2023-W15</option>
-                      </>
-                    )}
-                    {salesRange === 'month' && (
-                      <>
-                        <option value="2023-04">2023-04</option>
-                        <option value="2023-03">2023-03</option>
-                      </>
-                    )}
-                  </select>
-                )}
-                <TimeRangeSelector range={salesRange} onChange={setSalesRange} color="green" />
-              </div>
+              <TimeRangeSelector range={salesRange} onChange={setSalesRange} color="green" />
             </div>
             <div className="h-[350px]">
               <ResponsiveContainer width="100%" height="100%">
@@ -8468,51 +8454,33 @@ function ClassDashboard() {
           <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm h-full flex flex-col">
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-lg font-bold text-gray-800">客户层销售转化漏斗</h3>
-              <div className="flex items-center gap-3">
-                {funnelRange !== 'total' && (
-                  <select 
-                    value={funnelSubValue}
-                    onChange={(e) => setFunnelSubValue(e.target.value)}
-                    className="text-[10px] font-bold text-gray-400 bg-gray-50 border border-gray-100 px-2 py-1 rounded-lg outline-none cursor-pointer"
-                  >
-                    {funnelRange === 'month' && (
-                      <>
-                        <option value="2023-04">2023年 04月</option>
-                        <option value="2023-03">2023年 03月</option>
-                      </>
-                    )}
-                    {funnelRange === 'year' && (
-                      <>
-                        <option value="2023">2023年</option>
-                        <option value="2022">2022年</option>
-                      </>
-                    )}
-                  </select>
-                )}
+              <div className="flex items-center gap-2">
                 <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
                   {[
                     { id: 'month', label: '月' },
                     { id: 'year', label: '年' },
                     { id: 'total', label: '累计' }
                   ].map(r => (
-                    <button 
-                      key={r.id}
-                      onClick={() => setFunnelRange(r.id as any)}
-                      className={cn(
-                        "px-3 py-1 text-[10px] font-bold rounded-lg transition-all",
-                        funnelRange === r.id ? "bg-white text-green-600 shadow-sm" : "text-gray-400 hover:text-gray-600"
-                      )}
-                    >
-                      {r.label}
-                    </button>
-                  ))}
+                      <button 
+                        key={r.id}
+                        onClick={() => setFunnelRange(r.id as any)}
+                        className={cn(
+                          "px-3 py-1 text-[10px] font-bold rounded-lg transition-all",
+                          funnelRange === r.id ? "bg-white text-green-600 shadow-sm" : "text-gray-400 hover:text-gray-600"
+                        )}
+                      >
+                        {r.label}
+                      </button>
+                    ))}
+                  </div>
+                  <DateSelector range={funnelRange} value={funnelSubValue} onChange={setFunnelSubValue} />
                 </div>
               </div>
-            </div>
             <div className="h-[350px] flex flex-col justify-center overflow-auto no-scrollbar py-4">
               <SalesConversionFunnel 
                 funnel={(MOCK_DASHBOARD_OVERVIEW as any).funnels[3]} 
                 range={funnelRange} 
+                subValue={funnelSubValue}
               />
             </div>
           </div>
@@ -8532,8 +8500,7 @@ function ClassDashboard() {
               <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
                 {[
                   { id: 'domain', label: '领域' },
-                  { id: 'position', label: '岗位' },
-                  { id: 'certification', label: '认证' }
+                  { id: 'direction', label: '方向' }
                 ].map(r => (
                   <button 
                     key={r.id}
@@ -8662,7 +8629,7 @@ function ClassDashboard() {
         data={getRankingData()}
         columns={[
           { key: 'name', label: '名称' },
-          { key: rankingSort, label: rankingSort === 'revenue' ? '销售额' : rankingSort === 'sales' ? '销量' : rankingSort === 'inquiries' ? '咨询人次' : rankingSort.toUpperCase() },
+          { key: rankingSort, label: rankingSort === 'revenue' ? '销售额' : rankingSort === 'sales' ? '销量' : rankingSort === 'inquiries' ? '咨询数' : rankingSort.toUpperCase() },
         ]}
       />
 
@@ -8685,7 +8652,7 @@ function ClassDashboard() {
         data={c.contentData.engagement[engagementRange === 'week' || engagementRange === 'month' ? 'month' : engagementRange === 'custom' ? 'day' : engagementRange]}
         columns={[
           { key: 'date', label: '日期' },
-          { key: 'inquiries', label: '咨询人次' },
+          { key: 'inquiries', label: '咨询数' },
           { key: 'sales', label: '收藏数' }
         ]}
       />
@@ -8698,7 +8665,7 @@ function ClassDashboard() {
         columns={[
           { key: 'date', label: '日期' },
           { key: 'joined', label: '加入学习人次' },
-          { key: 'completed', label: '毕业人次' }
+          { key: 'completed', label: '颁发人次' }
         ]}
       />
     </div>
@@ -8722,7 +8689,7 @@ function CertDashboard() {
   const [learningRange, setLearningRange] = useState<'day' | 'week' | 'month' | 'custom'>('day');
   const [funnelRange, setFunnelRange] = useState<'month' | 'year' | 'total'>('total');
   const [rankingRange, setRankingRange] = useState<'week' | 'month' | 'total'>('total');
-  const [rankingSort, setRankingSort] = useState<'count' | 'pv' | 'uv' | 'inquiries' | 'sales'>('count');
+  const [rankingSort, setRankingSort] = useState<'count' | 'pv' | 'uv' | 'inquiries' | 'sales'>('pv');
   
   const [funnelSubValue, setFunnelSubValue] = useState('2023-W16');
   const [rankingSubValue, setRankingSubValue] = useState('2023-W16');
@@ -8782,7 +8749,7 @@ function CertDashboard() {
     { label: `${rangeLabel}上架证书`, value: (c.weeklyNew || 0).toLocaleString(), icon: <Plus className="text-cyan-500" /> },
     { label: `${rangeLabel}颁发人次`, value: Math.floor((c.totalIssued || 0) * 0.1).toLocaleString(), icon: <FileCheck className="text-blue-400" /> },
     { label: `${rangeLabel}销售量`, value: (c.periodSales || 0).toLocaleString(), icon: <TrendingUp className="text-emerald-500" /> },
-    { label: '新增咨询人次', value: '124', icon: <MessageSquare className="text-indigo-400" /> },
+    { label: '新增咨询数', value: '124', icon: <MessageSquare className="text-indigo-400" /> },
   ];
 
   return (
@@ -8812,7 +8779,7 @@ function CertDashboard() {
           </div>
           
           <div className="flex flex-wrap items-center gap-4">
-            <TimeRangeSelector range={globalRange} onChange={setGlobalRange} />
+            <TimeRangeSelector range={globalRange} onChange={setGlobalRange} showCustom={false} />
             <select 
               value={selectedSubValue}
               onChange={(e) => setSelectedSubValue(e.target.value)}
@@ -8933,7 +8900,7 @@ function CertDashboard() {
                   <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10}} />
                   <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
                   <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
-                  <Line yAxisId="left" type="monotone" dataKey="inquiries" name="咨询人次" stroke="#F59E0B" strokeWidth={3} dot={{r: 4}} />
+                  <Line yAxisId="left" type="monotone" dataKey="inquiries" name="咨询数" stroke="#F59E0B" strokeWidth={3} dot={{r: 4}} />
                   <Line yAxisId="left" type="monotone" dataKey="sales" name="收藏数" stroke="#EF4444" strokeWidth={3} dot={{r: 4}} />
                 </LineChart>
               </ResponsiveContainer>
@@ -8963,7 +8930,7 @@ function CertDashboard() {
                   <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
                   <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
                   <Line type="monotone" dataKey="joined" name="加入人次" stroke="#3B82F6" strokeWidth={3} dot={{r: 4}} />
-                  <Line type="monotone" dataKey="acquired" name="毕业人次" stroke="#10B981" strokeWidth={3} dot={{r: 4}} />
+                  <Line type="monotone" dataKey="acquired" name="颁发人次" stroke="#10B981" strokeWidth={3} dot={{r: 4}} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -8982,51 +8949,33 @@ function CertDashboard() {
         <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm flex flex-col">
           <div className="flex items-center justify-between mb-8">
             <h3 className="text-lg font-bold text-gray-800">客户层销售转化漏斗</h3>
-            <div className="flex items-center gap-3">
-              {funnelRange !== 'total' && (
-                <select 
-                  value={funnelSubValue}
-                  onChange={(e) => setFunnelSubValue(e.target.value)}
-                  className="text-[10px] font-bold text-gray-400 bg-gray-50 border border-gray-100 px-2 py-1 rounded-lg outline-none cursor-pointer"
-                >
-                    {funnelRange === 'month' && (
-                      <>
-                        <option value="2023-04">2023年 04月</option>
-                        <option value="2023-03">2023年 03月</option>
-                      </>
-                    )}
-                    {funnelRange === 'year' && (
-                      <>
-                        <option value="2023">2023年</option>
-                        <option value="2022">2022年</option>
-                      </>
-                    )}
-                </select>
-              )}
+            <div className="flex items-center gap-2">
               <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
                 {[
                   { id: 'month', label: '月' },
                   { id: 'year', label: '年' },
                   { id: 'total', label: '累计' }
                 ].map(r => (
-                  <button 
-                    key={r.id}
-                    onClick={() => setFunnelRange(r.id as any)}
-                    className={cn(
-                      "px-3 py-1 text-[10px] font-bold rounded-lg transition-all",
-                      funnelRange === r.id ? "bg-white text-green-600 shadow-sm" : "text-gray-400 hover:text-gray-600"
-                    )}
-                  >
-                    {r.label}
-                  </button>
-                ))}
+                    <button 
+                      key={r.id}
+                      onClick={() => setFunnelRange(r.id as any)}
+                      className={cn(
+                        "px-3 py-1 text-[10px] font-bold rounded-lg transition-all",
+                        funnelRange === r.id ? "bg-white text-green-600 shadow-sm" : "text-gray-400 hover:text-gray-600"
+                      )}
+                    >
+                      {r.label}
+                    </button>
+                  ))}
+                </div>
+                <DateSelector range={funnelRange} value={funnelSubValue} onChange={setFunnelSubValue} />
               </div>
             </div>
-          </div>
-          <div className="h-[400px] flex flex-col justify-center overflow-auto no-scrollbar py-4">
+            <div className="h-[400px] flex flex-col justify-center overflow-auto no-scrollbar py-4">
             <SalesConversionFunnel 
               funnel={(MOCK_DASHBOARD_OVERVIEW as any).funnels[2]} 
               range={funnelRange}
+              subValue={funnelSubValue}
               fullWidth={true}
             />
           </div>
@@ -9106,10 +9055,9 @@ function CertDashboard() {
                 onChange={(e) => setRankingSort(e.target.value as any)}
                 className="text-xs font-bold text-gray-600 bg-gray-50 border border-gray-100 px-3 py-1.5 rounded-lg outline-none"
               >
-                <option value="count">按颁发量</option>
                 <option value="pv">按PV</option>
                 <option value="uv">按UV</option>
-                <option value="inquiries">按咨询人次</option>
+                <option value="inquiries">按咨询量</option>
                 <option value="sales">按销售量</option>
               </select>
             </div>
@@ -9152,7 +9100,7 @@ function CertDashboard() {
         data={getRankingData()}
         columns={[
           { key: 'name', label: '名称' },
-          { key: rankingSort, label: rankingSort === 'count' ? '颁发量' : rankingSort === 'inquiries' ? '咨询人次' : rankingSort.toUpperCase() },
+          { key: rankingSort, label: rankingSort === 'count' ? '颁发量' : rankingSort === 'inquiries' ? '咨询数' : rankingSort.toUpperCase() },
         ]}
       />
 
@@ -9175,7 +9123,7 @@ function CertDashboard() {
         data={c.contentData.engagement[engagementRange === 'week' || engagementRange === 'month' ? 'month' : engagementRange === 'custom' ? 'day' : engagementRange]}
         columns={[
           { key: 'date', label: '日期' },
-          { key: 'inquiries', label: '咨询人次' },
+          { key: 'inquiries', label: '咨询数' },
           { key: 'sales', label: '收藏数' }
         ]}
       />
@@ -9188,7 +9136,7 @@ function CertDashboard() {
         columns={[
           { key: 'date', label: '日期' },
           { key: 'joined', label: '加入人次' },
-          { key: 'acquired', label: '毕业人次' },
+          { key: 'acquired', label: '颁发人次' },
           { key: 'rate', label: '证书获取率', format: (v) => `${v}%` }
         ]}
       />
@@ -9224,17 +9172,15 @@ function QuestionDashboard() {
   const rangeLabel = globalRange === 'day' ? '日' : globalRange === 'week' ? '周' : '月';
 
   const stats = statMode === 'accumulated' ? [
-    { label: '累计上架试题', value: (q.totalQuestions || 0).toLocaleString(), icon: <FileText className="text-blue-500" /> },
-    { label: '累计考试数量', value: '842', icon: <Award className="text-purple-500" /> },
-    { label: '累计刷题数量', value: '1,560', icon: <GraduationCap className="text-cyan-500" /> },
+    { label: '累计上架题目数量', value: (q.totalQuestions || 0).toLocaleString(), icon: <FileText className="text-blue-500" /> },
     { label: '累计考试人次', value: (q.totalExamsTaken || 0).toLocaleString(), icon: <FileCheck className="text-emerald-500" /> },
     { label: '累计刷题人次', value: (q.totalPracticeTaken || 0).toLocaleString(), icon: <Activity className="text-orange-500" /> },
+    { label: '累计练习人次', value: (q.totalExerciseTaken || 28500).toLocaleString(), icon: <BookOpen className="text-indigo-500" /> },
   ] : [
-    { label: `${rangeLabel}上架试题`, value: Math.floor((q.totalQuestions || 0) * 0.05).toLocaleString(), icon: <FileText className="text-blue-400" /> },
-    { label: `${rangeLabel}考试数量`, value: '12', icon: <Award className="text-purple-400" /> },
-    { label: `${rangeLabel}刷题数量`, value: '25', icon: <GraduationCap className="text-cyan-400" /> },
+    { label: `${rangeLabel}上架题目数量`, value: Math.floor((q.totalQuestions || 0) * 0.05).toLocaleString(), icon: <FileText className="text-blue-400" /> },
     { label: `${rangeLabel}考试人次`, value: (q.weeklyExamsTaken || 0).toLocaleString(), icon: <FileCheck className="text-emerald-400" /> },
     { label: `${rangeLabel}刷题人次`, value: (q.weeklyPracticeTaken || 0).toLocaleString(), icon: <Activity className="text-orange-400" /> },
+    { label: `${rangeLabel}练习人次`, value: (q.weeklyExerciseTaken || 2800).toLocaleString(), icon: <BookOpen className="text-indigo-400" /> },
   ];
 
   return (
@@ -9282,35 +9228,10 @@ function QuestionDashboard() {
                 </button>
               ))}
             </div>
-
-            <select 
-              value={selectedSubValue}
-              onChange={(e) => setSelectedSubValue(e.target.value)}
-              className="px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-600/20 min-w-[140px]"
-            >
-              {globalRange === 'day' && (
-                <>
-                  <option value="2023-04-21">2023-04-21</option>
-                  <option value="2023-04-20">2023-04-20</option>
-                </>
-              )}
-              {globalRange === 'week' && (
-                <>
-                  <option value="2023-W16">2023年 第16周</option>
-                  <option value="2023-W15">2023年 第15周</option>
-                </>
-              )}
-              {globalRange === 'month' && (
-                <>
-                  <option value="2023-04">2023年 04月</option>
-                  <option value="2023-03">2023年 03月</option>
-                </>
-              )}
-            </select>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, i) => (
             <div key={i} className="flex flex-col p-4 rounded-2xl bg-gray-50/50 border border-gray-100/50 transition-all hover:bg-white hover:shadow-md group">
               <div className="flex items-center gap-3 mb-3">
@@ -9392,35 +9313,9 @@ function QuestionDashboard() {
               查看数据
             </button>
           </div>
-          <div className="flex items-center gap-4">
-            {trendRange !== 'custom' && (
-              <select 
-                value={trendSubValue}
-                onChange={(e) => setTrendSubValue(e.target.value)}
-                className="text-[10px] font-bold text-gray-400 bg-gray-50 border border-gray-100 px-2 py-1 rounded-lg outline-none cursor-pointer"
-              >
-                {trendRange === 'day' && (
-                  <>
-                    <option value="2023-04-21">2023-04-21</option>
-                    <option value="2023-04-20">2023-04-20</option>
-                  </>
-                )}
-                {trendRange === 'week' && (
-                  <>
-                    <option value="2023-W16">2023-W16</option>
-                    <option value="2023-W15">2023-W15</option>
-                  </>
-                )}
-                {trendRange === 'month' && (
-                  <>
-                    <option value="2023-04">2023-04</option>
-                    <option value="2023-03">2023-03</option>
-                  </>
-                )}
-              </select>
-            )}
-            <TimeRangeSelector range={trendRange} onChange={setTrendRange} color="blue" />
-          </div>
+              <div className="flex items-center gap-4">
+                <TimeRangeSelector range={trendRange} onChange={setTrendRange} color="blue" />
+              </div>
         </div>
         <div className="h-[350px]">
           <ResponsiveContainer width="100%" height="100%">
@@ -9430,17 +9325,13 @@ function QuestionDashboard() {
                   <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.1}/>
                   <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
                 </linearGradient>
-                <linearGradient id="colorExamPass" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10B981" stopOpacity={0.1}/>
-                  <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
-                </linearGradient>
-                <linearGradient id="colorPracticePass" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.1}/>
-                  <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
-                </linearGradient>
                 <linearGradient id="colorPractice" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.1}/>
                   <stop offset="95%" stopColor="#F59E0B" stopOpacity={0}/>
+                </linearGradient>
+                <linearGradient id="colorExercise" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.1}/>
+                  <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
@@ -9449,9 +9340,8 @@ function QuestionDashboard() {
               <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
               <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '10px' }} />
               <Area type="monotone" dataKey="examParticipants" name="考试人次" stroke="#3B82F6" fill="url(#colorExams)" strokeWidth={3} />
-              <Area type="monotone" dataKey="examPassCount" name="考试通过人数" stroke="#10B981" fill="url(#colorExamPass)" strokeWidth={3} />
               <Area type="monotone" dataKey="practiceParticipants" name="刷题人次" stroke="#F59E0B" fill="url(#colorPractice)" strokeWidth={3} />
-              <Area type="monotone" dataKey="practicePassCount" name="刷题通过人数" stroke="#8B5CF6" fill="url(#colorPracticePass)" strokeWidth={3} />
+              <Area type="monotone" dataKey="exerciseParticipants" name="练习人次" stroke="#8B5CF6" fill="url(#colorExercise)" strokeWidth={3} />
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -9465,9 +9355,8 @@ function QuestionDashboard() {
         columns={[
           { key: 'date', label: '日期' },
           { key: 'examParticipants', label: '考试人次' },
-          { key: 'examPassCount', label: '考试通过人数' },
           { key: 'practiceParticipants', label: '刷题人次' },
-          { key: 'practicePassCount', label: '刷题通过人数' }
+          { key: 'exerciseParticipants', label: '练习人次' }
         ]}
       />
     </div>
