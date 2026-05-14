@@ -63,6 +63,7 @@ import {
   Award,
   AlertCircle,
   GraduationCap,
+  Info,
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -110,6 +111,7 @@ import {
   MOCK_QUESTION_DASHBOARD,
   MOCK_LEARNING_DASHBOARD,
   MOCK_ORG_USERS,
+  INTEREST_AREAS,
   DASHBOARD_FILTER_OPTIONS,
   CERTIFICATION_CATEGORIES
 } from './constants';
@@ -5701,12 +5703,17 @@ function PRDPage() {
 function OrgUserManagementPage() {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
+  const [areaFilter, setAreaFilter] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [showUpdateNotes, setShowUpdateNotes] = useState(false);
 
   const filteredUsers = MOCK_ORG_USERS.filter(user => {
     const matchesKeyword = user.realName.includes(searchKeyword) || user.loginAccount.includes(searchKeyword) || user.phone.includes(searchKeyword);
     const matchesRole = !roleFilter || user.role === roleFilter;
-    return matchesKeyword && matchesRole;
+    const matchesArea = !areaFilter || (user.interestAreas as string[]).includes(areaFilter);
+    return matchesKeyword && matchesRole && matchesArea;
   });
 
   const toggleSelectAll = () => {
@@ -5728,7 +5735,16 @@ function OrgUserManagementPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-800">机构用户管理</h2>
+        <div className="flex items-center gap-4">
+          <h2 className="text-2xl font-bold text-gray-800">机构用户管理</h2>
+          <button 
+            onClick={() => setShowUpdateNotes(true)}
+            className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-600 border border-amber-100 rounded-full hover:bg-amber-100 transition-all active:scale-95"
+          >
+            <Info size={14} className="animate-pulse" />
+            <span className="text-xs font-bold">V1.3.2 更新说明</span>
+          </button>
+        </div>
       </div>
 
       {/* Search Bar */}
@@ -5759,13 +5775,26 @@ function OrgUserManagementPage() {
               <option value="管理员">管理员</option>
             </select>
           </div>
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium text-gray-600 shrink-0">领域：</span>
+            <select 
+              value={areaFilter}
+              onChange={(e) => setAreaFilter(e.target.value)}
+              className="w-64 px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 appearance-none"
+            >
+              <option value="">请选择领域</option>
+              {INTEREST_AREAS.map(area => (
+                <option key={area} value={area}>{area}</option>
+              ))}
+            </select>
+          </div>
           <div className="flex items-center gap-3 ml-auto">
             <button className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20">
               <Search size={18} />
               搜索
             </button>
             <button 
-              onClick={() => { setSearchKeyword(''); setRoleFilter(''); }}
+              onClick={() => { setSearchKeyword(''); setRoleFilter(''); setAreaFilter(''); }}
               className="flex items-center gap-2 px-6 py-2 bg-white border border-gray-200 text-gray-600 rounded-xl font-bold hover:bg-gray-50 transition-all"
             >
               <RotateCcw size={18} />
@@ -5777,11 +5806,17 @@ function OrgUserManagementPage() {
 
       {/* Action Buttons */}
       <div className="flex flex-wrap items-center gap-3">
-        <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition-all text-sm">
+        <button 
+          onClick={() => setShowAddModal(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition-all text-sm"
+        >
           <Plus size={16} />
           添加用户
         </button>
-        <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg font-bold hover:bg-gray-50 transition-all text-sm">
+        <button 
+          onClick={() => setShowImportModal(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg font-bold hover:bg-gray-50 transition-all text-sm"
+        >
           <Plus size={16} />
           批量添加用户
         </button>
@@ -5822,9 +5857,10 @@ function OrgUserManagementPage() {
                 <th className="px-6 py-4">微信昵称</th>
                 <th className="px-6 py-4">性别</th>
                 <th className="px-6 py-4">身份证号</th>
-                <th className="px-6 py-4">学校</th>
+                <th className="px-6 py-4">单位</th>
                 <th className="px-6 py-4">学历</th>
                 <th className="px-6 py-4">职位</th>
+                <th className="px-6 py-4">领域</th>
                 <th className="px-6 py-4">创建时间</th>
                 <th className="px-6 py-4">账户状态</th>
                 <th className="px-6 py-4 text-right sticky right-0 bg-gray-50 z-20 shadow-[-4px_0_8px_rgba(0,0,0,0.05)]">操作</th>
@@ -5845,7 +5881,7 @@ function OrgUserManagementPage() {
                   <td className="px-6 py-4 font-medium text-gray-800">{user.realName}</td>
                   <td className="px-6 py-4 text-gray-600">{user.loginAccount}</td>
                   <td className="px-6 py-4 text-gray-600">{user.phone}</td>
-                                    <td className="px-6 py-4 text-gray-600">{user.role}</td>
+                  <td className="px-6 py-4 text-gray-600">{user.role}</td>
                   <td className="px-6 py-4 text-gray-400 font-mono text-xs">{user.wechatOpenId}</td>
                   <td className="px-6 py-4 text-gray-600">{user.wechatNickname}</td>
                   <td className="px-6 py-4 text-gray-600">{user.gender}</td>
@@ -5853,6 +5889,15 @@ function OrgUserManagementPage() {
                   <td className="px-6 py-4 text-gray-600">{user.school}</td>
                   <td className="px-6 py-4 text-gray-600">{user.education}</td>
                   <td className="px-6 py-4 text-gray-600">{user.position}</td>
+                  <td className="px-6 py-4">
+                    <div className="flex flex-wrap gap-1">
+                      {(user.interestAreas as string[] || []).map(area => (
+                        <span key={area} className="px-2 py-0.5 bg-blue-50 text-blue-600 text-xs rounded-md">
+                          {area}
+                        </span>
+                      ))}
+                    </div>
+                  </td>
                   <td className="px-6 py-4 text-gray-500">{user.createTime}</td>
                   <td className="px-6 py-4">
                     <span className="text-green-500 font-medium">{user.status}</span>
@@ -5871,7 +5916,351 @@ function OrgUserManagementPage() {
           </table>
         </div>
       </div>
+
+      <AddOrgUserModal 
+        isOpen={showAddModal} 
+        onClose={() => setShowAddModal(false)} 
+        onAdd={(newUser) => {
+          // In a real app we'd update state/db
+          MOCK_ORG_USERS.unshift({
+            ...newUser,
+            id: `U${Date.now()}`,
+            createTime: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
+            status: '正常',
+            wechatOpenId: '-',
+            gender: '男',
+            idCard: '-',
+            school: '-',
+            interestAreas: newUser.interestAreas || []
+          } as any);
+          setShowAddModal(false);
+        }}
+      />
+
+      <ImportOrgUserModal 
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+      />
+
+      <UpdateNotesModal 
+        isOpen={showUpdateNotes}
+        onClose={() => setShowUpdateNotes(false)}
+      />
     </div>
+  );
+}
+
+function AddOrgUserModal({ 
+  isOpen, 
+  onClose,
+  onAdd
+}: { 
+  isOpen: boolean, 
+  onClose: () => void,
+  onAdd: (user: any) => void
+}) {
+  const [formData, setFormData] = useState({
+    loginAccount: '',
+    realName: '',
+    phone: '',
+    role: '学员',
+    interestAreas: [] as string[]
+  });
+
+  if (!isOpen) return null;
+
+  const toggleArea = (area: string) => {
+    if (formData.interestAreas.includes(area)) {
+      setFormData({ ...formData, interestAreas: formData.interestAreas.filter(a => a !== area) });
+    } else {
+      setFormData({ ...formData, interestAreas: [...formData.interestAreas, area] });
+    }
+  };
+
+  return (
+    <AnimatePresence>
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+        onClick={onClose}
+      >
+        <motion.div 
+          initial={{ scale: 0.95, opacity: 0, y: 20 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.95, opacity: 0, y: 20 }}
+          className="bg-white rounded-[32px] w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col"
+          onClick={e => e.stopPropagation()}
+        >
+          <div className="p-6 border-b border-gray-50 flex items-center justify-between">
+            <h3 className="text-xl font-bold text-gray-800">添加用户</h3>
+            <button onClick={onClose} className="p-2 hover:bg-gray-50 rounded-xl transition-colors text-gray-400">
+              <X size={20} />
+            </button>
+          </div>
+          
+          <div className="p-8 space-y-6 overflow-y-auto max-h-[70vh]">
+            <div className="grid grid-cols-1 gap-6">
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-gray-700 flex items-center gap-1">
+                  <span className="text-red-500">*</span> 登录账号：
+                </label>
+                <input 
+                  type="text" 
+                  value={formData.loginAccount}
+                  onChange={e => setFormData({ ...formData, loginAccount: e.target.value })}
+                  placeholder="请输入登录账号"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-gray-700 flex items-center gap-1">
+                  <span className="text-red-500">*</span> 真实姓名：
+                </label>
+                <input 
+                  type="text" 
+                  value={formData.realName}
+                  onChange={e => setFormData({ ...formData, realName: e.target.value })}
+                  placeholder="请输入真实姓名"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-gray-700 flex items-center gap-1">
+                  <span className="text-red-500">*</span> 手机号码：
+                </label>
+                <input 
+                  type="text" 
+                  value={formData.phone}
+                  onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                  placeholder="请输入手机号码"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-gray-700 flex items-center gap-1">
+                  <span className="text-red-500">*</span> 所属角色：
+                </label>
+                <select 
+                  value={formData.role}
+                  onChange={e => setFormData({ ...formData, role: e.target.value })}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 outline-none transition-all appearance-none"
+                >
+                  <option value="学员">学员</option>
+                  <option value="教师">教师</option>
+                  <option value="管理员">管理员</option>
+                </select>
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-sm font-bold text-gray-700">兴趣领域：</label>
+                <div className="flex flex-wrap gap-3">
+                  {INTEREST_AREAS.map(area => (
+                    <label 
+                      key={area}
+                      className={cn(
+                        "flex items-center gap-2 px-4 py-2 border rounded-xl cursor-pointer transition-all",
+                        formData.interestAreas.includes(area)
+                          ? "bg-blue-50 border-blue-200 text-blue-600 shadow-sm"
+                          : "bg-white border-gray-100 text-gray-500 hover:border-gray-200"
+                      )}
+                    >
+                      <input 
+                        type="checkbox"
+                        checked={formData.interestAreas.includes(area)}
+                        onChange={() => toggleArea(area)}
+                        className="hidden"
+                      />
+                      <span className="text-xs font-medium">{area}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-6 bg-gray-50 flex gap-4 shrink-0">
+            <button 
+              onClick={onClose}
+              className="flex-1 py-3 text-sm font-bold text-gray-500 hover:bg-gray-100 rounded-xl transition-all"
+            >
+              取消
+            </button>
+            <button 
+              onClick={() => onAdd(formData)}
+              className="flex-1 py-3 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20"
+            >
+              确定
+            </button>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+function ImportOrgUserModal({ 
+  isOpen, 
+  onClose
+}: { 
+  isOpen: boolean, 
+  onClose: () => void
+}) {
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+        onClick={onClose}
+      >
+        <motion.div 
+          initial={{ scale: 0.95, opacity: 0, y: 20 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.95, opacity: 0, y: 20 }}
+          className="bg-white rounded-[32px] w-full max-w-xl overflow-hidden shadow-2xl flex flex-col"
+          onClick={e => e.stopPropagation()}
+        >
+          <div className="p-6 border-b border-gray-50 flex items-center justify-between">
+            <h3 className="text-xl font-bold text-gray-800">批量导入用户</h3>
+            <button onClick={onClose} className="p-2 hover:bg-gray-50 rounded-xl transition-colors text-gray-400">
+              <X size={20} />
+            </button>
+          </div>
+          
+          <div className="p-8 space-y-8">
+            <div className="bg-blue-50/50 p-6 rounded-2xl border border-blue-100/50 space-y-4">
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-blue-100 rounded-xl text-blue-600 shrink-0">
+                  <Download size={24} />
+                </div>
+                <div className="space-y-1">
+                  <h4 className="text-sm font-bold text-gray-800">下载导入模版</h4>
+                  <p className="text-xs text-gray-500 leading-relaxed">
+                    请先下载标准模版，按格式填写后再上传。兴趣领域若有多个，请用标识符隔开。
+                  </p>
+                </div>
+                <button className="ml-auto flex items-center gap-2 px-4 py-2 bg-white border border-blue-200 text-blue-600 rounded-lg text-xs font-bold hover:bg-blue-50 transition-all shrink-0">
+                  点击下载
+                </button>
+              </div>
+            </div>
+
+            <div className="border-2 border-dashed border-gray-100 rounded-3xl p-12 text-center space-y-4 hover:border-blue-200 hover:bg-blue-50/20 transition-all cursor-pointer group">
+              <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto text-gray-400 group-hover:bg-blue-100 group-hover:text-blue-600 transition-all">
+                <Plus size={32} />
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm font-bold text-gray-600">点击或将文件拖拽到这里进行上传</p>
+                <p className="text-xs text-gray-400">支持 .xls, .xlsx 格式</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-6 bg-gray-50 flex gap-4 shrink-0">
+            <button 
+              onClick={onClose}
+              className="flex-1 py-3 text-sm font-bold text-gray-500 hover:bg-gray-100 rounded-xl transition-all"
+            >
+              取消
+            </button>
+            <button 
+              onClick={onClose}
+              className="flex-1 py-3 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20"
+            >
+              开始解析并导入
+            </button>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+function UpdateNotesModal({ 
+  isOpen, 
+  onClose 
+}: { 
+  isOpen: boolean, 
+  onClose: () => void 
+}) {
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+        onClick={onClose}
+      >
+        <motion.div 
+          initial={{ scale: 0.95, opacity: 0, y: 20 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.95, opacity: 0, y: 20 }}
+          className="bg-white rounded-[32px] w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col"
+          onClick={e => e.stopPropagation()}
+        >
+          <div className="p-6 border-b border-gray-50 flex items-center justify-between bg-amber-50/30">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-amber-100 rounded-xl text-amber-600">
+                <Info size={24} />
+              </div>
+              <h3 className="text-xl font-bold text-gray-800">V1.3.2 更新说明</h3>
+            </div>
+            <button onClick={onClose} className="p-2 hover:bg-white rounded-xl transition-colors text-gray-400 border border-transparent hover:border-gray-100">
+              <X size={20} />
+            </button>
+          </div>
+          
+          <div className="p-8 space-y-6">
+            <div className="space-y-4">
+              <div className="flex items-start gap-4 p-4 bg-blue-50/50 rounded-2xl border border-blue-100/50">
+                <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">1</div>
+                <p className="text-sm text-gray-700 leading-relaxed font-medium">
+                  管理端 <span className="text-blue-600 font-bold">机构用户管理</span>-新增、导入用户增加 “兴趣领域”，多选，非必填（导入模版 用 标识符号隔开即可）；
+                </p>
+              </div>
+
+              <div className="flex items-start gap-4 p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100/50">
+                <div className="w-6 h-6 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">2</div>
+                <p className="text-sm text-gray-700 leading-relaxed font-medium">
+                  兴趣领域取“领域”字典；
+                </p>
+              </div>
+
+              <div className="flex items-start gap-4 p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100/50">
+                <div className="w-6 h-6 bg-emerald-600 text-white rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">3</div>
+                <p className="text-sm text-gray-700 leading-relaxed font-medium">
+                  用户列表展示领域并参与筛选。
+                </p>
+              </div>
+
+              <div className="flex items-start gap-4 p-4 bg-purple-50/50 rounded-2xl border border-purple-100/50">
+                <div className="w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">4</div>
+                <p className="text-sm text-gray-700 leading-relaxed font-medium">
+                  增加 <span className="text-purple-600 font-bold">微信昵称、性别、单位、学历、职位</span> 信息；取前端学员数据，仅展示，不做编辑。
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-6 bg-gray-50 flex justify-end shrink-0">
+            <button 
+              onClick={onClose}
+              className="px-8 py-3 bg-white border border-gray-200 text-gray-600 rounded-xl text-sm font-bold hover:bg-gray-100 transition-all shadow-sm"
+            >
+              我知道了
+            </button>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
   );
 }
 
@@ -6194,6 +6583,72 @@ function SalesConversionFunnel({ funnel, fullWidth = false, range = 'week', subV
   );
 }
 
+function DocumentationEntry() {
+  const [isOpen, setIsOpen] = useState(false);
+  
+  return (
+    <>
+      <div className="fixed bottom-6 right-6 z-40">
+        <button 
+          onClick={() => setIsOpen(true)}
+          className="group flex items-center gap-2 p-3 bg-white text-indigo-600 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgb(79,70,229,0.2)] border border-indigo-50 transition-all hover:-translate-y-1 active:scale-95"
+        >
+          <div className="w-8 h-8 bg-indigo-50 rounded-full flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+            <BookOpen size={16} />
+          </div>
+          <span className="text-xs font-bold pr-2">文档说明</span>
+        </button>
+      </div>
+      
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 md:p-8"
+            onClick={() => setIsOpen(false)}
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="bg-white rounded-3xl shadow-2xl w-full max-w-6xl h-[85vh] flex flex-col overflow-hidden"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="p-4 md:p-6 border-b border-gray-100 flex items-center justify-between bg-white">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-indigo-50 rounded-xl text-indigo-600">
+                    <BookOpen size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg md:text-xl font-black text-gray-800 tracking-tight">数据中心文档说明</h3>
+                    <p className="text-[10px] md:text-sm text-gray-400 font-bold uppercase tracking-wider">Business Logic & Data Definitions</p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setIsOpen(false)}
+                  className="p-2 hover:bg-gray-100 rounded-xl transition-colors text-gray-400 hover:text-gray-600"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+              <div className="flex-1 bg-gray-50 relative">
+                <iframe 
+                  src="https://www.kdocs.cn/l/cgYOhf1dnnjg" 
+                  className="absolute inset-0 w-full h-full border-none"
+                  title="Documentation"
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
+
 function AdminDashboardPage({ 
   activeModule
 }: { 
@@ -6213,6 +6668,8 @@ function AdminDashboardPage({
         {activeModule === 'learning' && <LearningDashboard />}
         {activeModule === 'data-table' && <DataTableDashboard />}
       </div>
+      
+      {['user', 'class', 'cert', 'question'].includes(activeModule) && <DocumentationEntry />}
     </div>
   );
 }

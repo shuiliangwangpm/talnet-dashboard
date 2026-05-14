@@ -659,6 +659,20 @@ export const MOCK_USER_STATS = {
   }))
 };
 
+export const INTEREST_AREAS = [
+  '物联网',
+  '孪生元宇宙',
+  '三教改革',
+  '人工智能',
+  '大数据',
+  '区块链',
+  '数字商科',
+  '工业互联网',
+  '创新创业',
+  'OpenHarmony',
+  '数字素养'
+];
+
 export const MOCK_ORG_USERS = Array.from({ length: 15 }, (_, i) => ({
   id: `U${1000 + i}`,
   realName: i < 2 ? `学员${12 - i}` : i < 6 ? `学生${10 - i + 2}` : `用户${i + 1}`,
@@ -673,7 +687,8 @@ export const MOCK_ORG_USERS = Array.from({ length: 15 }, (_, i) => ({
   idCard: `11010119900101${1000 + i}`,
   school: i % 3 === 0 ? '北京大学' : i % 3 === 1 ? '清华大学' : '复旦大学',
   education: i % 2 === 0 ? '本科' : '硕士',
-  position: i % 2 === 0 ? '开发工程师' : '产品经理'
+  position: i % 2 === 0 ? '开发工程师' : '产品经理',
+  interestAreas: i % 4 === 0 ? ['物联网', '大数据'] : i % 4 === 1 ? ['人工智能'] : i % 4 === 2 ? ['三教改革', '数字素养'] : []
 }));
 
 export const MOCK_COURSE_DASHBOARD = {
